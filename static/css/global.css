@@ -1,0 +1,49 @@
+ * {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+ }
+
+ :root {
+     --clr-bg: hsl(231, 95%, 2%);
+     --clr-bg2: hsl(231, 95%, 10%);
+     --clr-bg3: hsl(231, 95%, 18%);
+     --clr-h1: hsl(0, 0%, 100%);
+     --clr-h2: hsl(0, 0%, 90%);
+     --clr-p: hsl(0, 0%, 70%);
+     --clr-border-neon: rgba(5, 88, 255, .25);
+     --truncate-line: 3;
+     --common-spacing: 1rem;
+     --common-spacing-half: 0.5rem;
+     --clr-link: hsl(231, 95%, 59%);
+     --clr-accent: #09a1d9;
+     --clr-topic: #f4d03f;
+     --clr-post: #8cc640;
+ }
+
+ body {
+     background-color: var(--clr-bg);
+     background-attachment: fixed;
+     background-image: radial-gradient(circle at 35% 50%, rgba(5, 88, 255, .15), transparent 50%), radial-gradient(circle at 65% 50%, rgba(128, 0, 74, .15), transparent 50%), radial-gradient(circle at 50% 65%, rgba(74, 128, 0, .15), transparent 50%);
+     color: var(--clr-p);
+     font-family: "Poppins";
+     padding: var(--common-spacing);
+ }
+
+ h1,
+ h2,
+ h3,
+ h4,
+ h5,
+ h6 {
+     font-family: "Montserrat";
+ }
+
+ ::selection {
+     background: var(--clr-border-neon);
+ }
+
+ img {
+     max-width: 100%;
+     height: auto;
+ }

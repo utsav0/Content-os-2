@@ -1,0 +1,128 @@
+body {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+}
+
+main {
+    width: min(95vw, 800px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--common-spacing);
+}
+
+button a,
+.search-bar__icon-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.search-bar,
+.page-links {
+    grid-column: 1 / -1;
+}
+
+.page-links {
+    display: grid;
+    grid-template-columns: subgrid;
+    gap: 20px;
+}
+
+.search-bar {
+    width: 100%;
+    position: relative;
+    outline: 1.5px solid transparent;
+    transition: outline-color 0.3s ease;
+    display: flex;
+}
+
+.search-bar:focus-within {
+    outline-color: color-mix(in hsl, var(--clr-border-neon), white 20%);
+}
+
+.search-bar__input {
+    width: 100%;
+    height: 2.5rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding-left: 1rem;
+    color: var(--clr-p);
+}
+
+.search-bar__icon-link {
+    cursor: pointer;
+    height: 100%;
+    aspect-ratio: 1;
+    transition: color 0.3s ease;
+}
+
+.search-bar__icon:hover {
+    color: color-mix(in hsl, var(--clr-p), white 50%);
+}
+
+.search-bar__icon-link:has(:focus-visible) {
+    border: 2px solid var(--clr-border-neon);
+}
+
+.page-links__item {
+    background-color: color-mix(in hsl, var(--clr-bg2), transparent 2%);
+    display: grid;
+    padding: 2rem;
+    gap: var(--common-spacing);
+}
+
+.page-links__button {
+    width: 100%;
+}
+
+.search-bar__search-suggestions {
+    width: 100%;
+    max-height: 300px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    position: absolute;
+    top: calc(100% + 2px);
+    overflow: scroll;
+    background-color: var(--clr-bg);
+    z-index: 1;
+}
+
+.search-bar:not(:focus-within) .search-bar__search-suggestions, .search-bar__search-suggestions:empty{
+    display: none;
+}
+
+.suggestion-item {
+    color: color-mix(in hsl, var(--clr-p), transparent 30%);
+    height: 1.2lh;
+}
+
+.suggestion-item--post::before {
+    content: "Post: ";
+    --local-color: var(--clr-post);
+}
+
+.suggestion-item--topic::before {
+    content: "Topic: ";
+    --local-color: var(--clr-topic);
+}
+
+.suggestion-item::before {
+    background: color-mix(in hsl, var(--local-color), transparent 75%);
+    padding: 1px 8px;
+    border-radius: 20rem;
+    margin-right: 1ch;
+    font-size: 0.8em;
+    border: 1px solid color-mix(in hsl, var(--local-color), transparent 35%);
+    display: inline-block;
+}
+
+.suggestion-item {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 80%;
+    flex-shrink: 0;
+    white-space: nowrap;
+}

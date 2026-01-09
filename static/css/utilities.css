@@ -1,0 +1,56 @@
+ .rounded-border-box {
+     display: inline-grid;
+     place-items: center;
+     border: 2px solid var(--clr-border-neon);
+     border-radius: 10px;
+ }
+
+ .rounded-box {
+     border-radius: 10px;
+     padding: 3px 10px;
+ }
+
+  .centered-grid {
+     display: grid;
+     place-items: center;
+ }
+
+ .btn {
+     --clr-btn-bg: var(--clr-h1);
+     background-color: var(--clr-btn-bg);
+     color: var(--clr-bg);
+     padding: 10px;
+     cursor: pointer;
+     border-radius: 20rem;
+     outline: none;
+     border: none;
+     font-weight: 600;
+     transition: background-color 0.3s ease;
+ }
+
+ .btn--primary {
+     --clr-btn-bg: var(--clr-accent);
+     background-color: var(--clr-btn-bg);
+ }
+ .btn--secondary {
+     --clr-btn-bg: var(--clr-p);
+     background-color: var(--clr-btn-bg);
+ }
+
+ .btn:hover {
+     background-color: color-mix(in hsl, var(--clr-btn-bg), #000 15%);
+ }
+
+ .hoverable-white {
+     color: var(--clr-p);
+     transition: color 0.3s ease;
+     cursor: pointer;
+ }
+
+ .hoverable-white:hover {
+     color: color-mix(in hsl, var(--clr-p), white 50%)
+ }
+
+ .nulled-link{
+    text-decoration: none;
+ }

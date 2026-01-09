@@ -1,0 +1,63 @@
+body {
+  padding-top: 4rem;
+}
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--clr-bg2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.nav__list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 0;
+  padding: 1rem 2rem;
+  list-style: none;
+}
+
+.nav__link {
+  font-weight: 500;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav__link--active {
+  color: var(--clr-link);
+  font-weight: 600;
+  border-bottom: 2px solid currentColor;
+}
+
+.nav__item--icon{
+  cursor: pointer;
+}
+
+.nav__item--icon--download{
+  position: relative;
+}
+
+.nav__item--icon--download::after{
+  content: "Download Data";
+  text-wrap: nowrap;
+  background-color: var(--clr-h1);
+  padding: 2px 4px;
+  border-radius: 5px;
+  color: var(--clr-bg2);
+  font-size: 0.8rem;
+  left: 50%;
+  top: calc(10px + 100%);
+  transform: translateX(-50%);
+  position: absolute;
+  opacity: 0;
+  display: none;
+  transition: all 1s;
+}
+.nav__item--icon--download:hover::after{
+  opacity: 1;
+  display: inline;
+}
