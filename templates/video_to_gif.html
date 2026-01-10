@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Video to GIF - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_upload.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <h1>Convert Video to GIF</h1>
+    
+    {% if error %}
+    <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    <form action="/video-to-gif" method="post" enctype="multipart/form-data" class="add-post-form">
+        <div class="form-group">
+            <label for="video-upload">Upload MP4 Video</label>
+            <input type="file" id="video-upload" name="file" class="form-input" accept="video/mp4,video/x-m4v,video/*" required>
+        </div>
+        <button type="submit" class="btn btn--primary">Convert & Download</button>
+    </form>
+    
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/video_to_gif.js') }}"></script>
+{% endblock %}

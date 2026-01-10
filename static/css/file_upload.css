@@ -1,3 +1,5 @@
+/* This file can be used anywhere we need a single input type page */
+
 body {
     display: grid;
     place-items: center;

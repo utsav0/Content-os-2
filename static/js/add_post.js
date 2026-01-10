@@ -8,6 +8,7 @@ fileInput.addEventListener('change', (e) => {
         const allowedTypes = ['text/csv', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
         if (allowedTypes.includes(file.type) && !files.some(f => f.name === file.name)) {
             files.push(file);
+            
         }
     }
     updateFileTags();

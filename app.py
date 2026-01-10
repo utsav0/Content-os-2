@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, after_this_request
 from flask_cors import CORS
 import mysql.connector
 from contextlib import contextmanager
@@ -9,6 +9,8 @@ from logging.handlers import RotatingFileHandler
 import sys
 import statistics
 import file_handler
+import subprocess
+from werkzeug.utils import secure_filename
 
 
 # Load environment
@@ -140,6 +142,79 @@ def add_post():
                 error = result 
     return render_template("add_post.html", error=error)
 
+# Video to gif: 
+@app.route("/video-to-gif", methods=['GET', 'POST'])
+def video_to_gif_page():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return render_template('video_to_gif.html', error='No file part')
+        
+        file = request.files['file']
+        if file.filename == '':
+            return render_template('video_to_gif.html', error='No selected file')
+
+        if file:
+            try:
+                # Setup paths
+                filename = secure_filename(file.filename)
+                # Create a temporary directory if it doesn't exist
+                temp_dir = os.path.join(app.root_path, 'temp_uploads')
+                os.makedirs(temp_dir, exist_ok=True)
+                
+                input_path = os.path.join(temp_dir, filename)
+                file.save(input_path)
+
+                base_name = os.path.splitext(input_path)[0]
+                palette_path = f"{base_name}_palette.png"
+                output_gif_path = f"{base_name}.gif"
+
+                # === Conversion Logic (Adapted from your script) ===
+                
+                # Step 1: Generate optimal palette
+                palette_cmd = [
+                    "ffmpeg", "-y", "-i", input_path,
+                    "-vf", "fps=15,scale=iw:ih:flags=lanczos,palettegen=stats_mode=full",
+                    palette_path
+                ]
+
+                # Step 2: Create GIF using palette
+                gif_cmd = [
+                    "ffmpeg", "-y", "-i", input_path, "-i", palette_path,
+                    "-filter_complex", "fps=15,scale=iw:ih:flags=lanczos[x];[x][1:v]paletteuse=dither=sierra2_4a",
+                    output_gif_path
+                ]
+
+                subprocess.run(palette_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(gif_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+                # === Cleanup & Send ===
+
+                # Schedule cleanup of files after the response is sent
+                @after_this_request
+                def cleanup(response):
+                    try:
+                        if os.path.exists(input_path): os.remove(input_path)
+                        if os.path.exists(palette_path): os.remove(palette_path)
+                        if os.path.exists(output_gif_path): os.remove(output_gif_path)
+                    except Exception as e:
+                        app.logger.error(f"Error cleaning up temp files: {e}")
+                    return response
+
+                return send_file(
+                    output_gif_path, 
+                    as_attachment=True, 
+                    download_name=f"{os.path.splitext(filename)[0]}.gif",
+                    mimetype='image/gif'
+                )
+
+            except subprocess.CalledProcessError:
+                app.logger.error("FFmpeg failed to convert video")
+                return render_template('video_to_gif.html', error="Error processing video. Please ensure FFmpeg is installed and the video file is valid.")
+            except Exception as e:
+                app.logger.error(f"Unexpected error: {e}")
+                return render_template('video_to_gif.html', error=f"An error occurred: {str(e)}")
+
+    return render_template('video_to_gif.html')
 
 # API routes
 
