@@ -11,7 +11,7 @@
     <div class="search-bar rounded-border-box">
         <input type="text" name="search" id="search-input" class="search-bar__input" placeholder="Search..."
             autocomplete="off">
-        <a href="#" class="search-bar__icon-link centered-grid" aria-label="Search">
+        <a href="#" class="search-bar__icon-link centered-grid hoverable-white nulled-link" aria-label="Search">
             <i class="fa-solid fa-magnifying-glass search-bar__icon"></i>
         </a>
         <div id="search-suggestions" class="search-bar__search-suggestions"></div>
@@ -47,8 +47,4 @@
         </div>
     </section>
 </main>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}
