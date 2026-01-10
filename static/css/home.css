@@ -90,7 +90,8 @@ button a,
     z-index: 1;
 }
 
-.search-bar:not(:focus-within) .search-bar__search-suggestions, .search-bar__search-suggestions:empty{
+.search-bar:not(:focus-within) .search-bar__search-suggestions,
+.search-bar__search-suggestions:empty {
     display: none;
 }
 
@@ -125,4 +126,16 @@ button a,
     width: 80%;
     flex-shrink: 0;
     white-space: nowrap;
+}
+
+.suggestion-item--error {
+    display: flex;
+}
+
+.suggestion-item--error::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f06a";
+    font-size: 1.2rem;
+    color: var(--clr-error);
 }

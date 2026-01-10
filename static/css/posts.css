@@ -1,0 +1,108 @@
+main.data-container {
+    display: grid;
+    grid-template-columns: 1fr repeat(6, auto);
+    column-gap: var(--common-spacing);
+    padding: var(--common-spacing);
+    background-color: var(--clr-bg);
+    margin-top: 50px;
+}
+
+.data-container__item--header,
+.data-container__item--post-container {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+}
+
+.data-container__item--filter {
+    margin-right: var(--common-spacing);
+    margin-bottom: 3px;
+    justify-self: end;
+    grid-column: 1 / -1;
+    position: relative;
+}
+
+.filter-form.hidden{
+    display: none;
+}
+
+.filter-form {
+    padding: var(--common-spacing);
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--clr-bg2);
+    /* width: 400px; */
+    display: grid;
+    gap: var(--common-spacing);
+    justify-items: stretch;
+}
+.filter-form::backdrop{
+    filter: blur(5px);
+}
+
+.filter-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--common-spacing-half);
+}
+
+.filter-form__label {
+    grid-column: 1 / -1;
+}
+
+.filter-form__input {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid var(--clr-border-neon);
+    padding: var(--common-spacing-half);
+    color: white;
+}
+
+.filter-form__input:focus{
+    border-color: color-mix(in hsl, var(--clr-border-neon), blue 20%);
+}
+
+.filter-form__button{
+    margin-inline: center;
+}
+
+.data-container__item--header {
+    background-color: color-mix(in hsl, var(--clr-bg), white 2%);
+    padding: var(--common-spacing-half) var(--common-spacing);
+}
+
+.data-container__item--post-container {
+    row-gap: var(--common-spacing-half)
+}
+
+.post {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-items: center;
+    text-wrap: nowrap;
+    background-color: var(--clr-bg2);
+    padding: var(--common-spacing-half) var(--common-spacing);
+}
+
+.post__media {
+    max-width: 40px;
+    height: auto;
+    display: none;
+}
+
+.post__caption {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-wrap: nowrap;
+    padding-right: 1ch;
+}
+
+.post__stats {
+    grid-column: 2 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Posts - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="data-container">
+    <div class="data-container__item data-container__item--filter">
+        <i class="fa-solid fa-filter hoverable-white" id="filter-button"></i>
+        <form class="filter-form rounded-border-box hidden">
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="impressions-from">Impressions</label>
+                <input type="number" class="filter-form__input" id="impressions-from" name="impressions_from"
+                    placeholder="From">
+                <input type="number" class="filter-form__input" id="impressions-to" name="impressions_to"
+                    placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="likes-from">Likes</label>
+                <input type="number" class="filter-form__input" id="likes-from" name="likes_from" placeholder="From">
+                <input type="number" class="filter-form__input" id="likes-to" name="likes_to" placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="comments-from">Comments</label>
+                <input type="number" class="filter-form__input" id="comments-from" name="comments_from"
+                    placeholder="From">
+                <input type="number" class="filter-form__input" id="comments-to" name="comments_to" placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="date-from">Date</label>
+                <input type="date" class="filter-form__input" id="date-from" name="date_from">
+                <input type="date" class="filter-form__input" id="date-to" name="date_to">
+            </div>
+
+            <div class="filter-form__row filter-form__row--actions">
+                <button type="button" class="filter-form__button btn btn--secondary" id="clear-filters">Clear
+                    Filters</button>
+                <button type="submit" class="filter-form__button btn btn--primary">Apply Filters</button>
+            </div>
+        </form>
+
+    </div>
+    <div class="data-container__item data-container__item--header">
+        <div class="header__caption hoverable-white"></div>
+        <div class="header__impressions">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-impressions"></i>
+        </div>
+        <div class="header__likes">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-likes"></i>
+        </div>
+        <div class="header__comments">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-comments"></i>
+        </div>
+        <div class="header__ctr">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-ctr"></i>
+        </div>
+        <div class="header__clicks">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-clicks"></i>
+        </div>
+        <div class="header__dates">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-dates"></i>
+        </div>
+    </div>
+    <div id="posts-container" class="data-container__item data-container__item--post-container">
+        {% for post in posts %}
+        <div class="post">
+            <a href="/post/{{ post.post_id }}" class="post__caption hoverable-white nulled-link" target="_blank">
+                {{ post.caption|e }}
+            </a>
+            <div class="post__stats">
+                <span><i class="fas fa-eye"></i> {{ post.impressions }}</span>
+                <span><i class="fas fa-heart"></i> {{ post.likes }}</span>
+                <span><i class="fas fa-comment"></i> {{ post.comments }}</span>
+                <span>
+                    <i class="fa-solid fa-rocket"></i>
+                    {{ (post.main_ebook_clicks / post.impressions * 100) | round(2) }}
+                </span>
+                <span><i class="fa-solid fa-mouse-pointer"></i> {{ post.main_ebook_clicks }}</span>
+                <span><i class="fa-solid fa-calendar"></i> {{ post.post_datetime }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+<div id="loading" style="display: none;">
+    <p>Loading more posts...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/posts.js') }}"></script>
+{% endblock %}

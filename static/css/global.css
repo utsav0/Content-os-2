@@ -5,7 +5,7 @@
  }
 
  :root {
-     --clr-bg: hsl(231, 95%, 2%);
+     --clr-bg: #00020a;
      --clr-bg2: hsl(231, 95%, 10%);
      --clr-bg3: hsl(231, 95%, 18%);
      --clr-h1: hsl(0, 0%, 100%);
@@ -19,6 +19,7 @@
      --clr-accent: #09a1d9;
      --clr-topic: #f4d03f;
      --clr-post: #8cc640;
+     --clr-error: #ff330a;
  }
 
  body {
