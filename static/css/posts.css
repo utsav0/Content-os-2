@@ -4,7 +4,6 @@ main.data-container {
     column-gap: var(--common-spacing);
     padding: var(--common-spacing);
     background-color: var(--clr-bg);
-    margin-top: 50px;
 }
 
 .data-container__item--header,

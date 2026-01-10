@@ -1,5 +1,5 @@
 body {
-  padding-top: 4rem;
+  margin-top: var(--nav-space);
 }
 
 .nav {
@@ -33,15 +33,15 @@ body {
   border-bottom: 2px solid currentColor;
 }
 
-.nav__item--icon{
+.nav__item--icon {
   cursor: pointer;
 }
 
-.nav__item--icon--download{
+.nav__item--icon--download {
   position: relative;
 }
 
-.nav__item--icon--download::after{
+.nav__item--icon--download::after {
   content: "Download Data";
   text-wrap: nowrap;
   background-color: var(--clr-h1);
@@ -57,7 +57,8 @@ body {
   display: none;
   transition: all 1s;
 }
-.nav__item--icon--download:hover::after{
+
+.nav__item--icon--download:hover::after {
   opacity: 1;
   display: inline;
 }

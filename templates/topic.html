@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Topics - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/topic.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="topic-container">
+    {% if topic %}
+    <div class="topic-header">
+        <h1>{{ topic.name }}</h1>
+        <p>Total Posts: {{ total_posts }}</p>
+        <p>Last Post Date: {{ last_post_date }}</p>
+        <div class="extra-details">
+            {% for topic in relevant_topics %}
+            <a href="/topic/{{ topic.id }}"
+                class="extra-details__item extra-details__item--similar-topics nulled-link hoverable-white"><i
+                    class="fa-solid fa-tags"></i>{{ topic.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h2>Topic Stats</h2>
+    <div class="topic-stats">
+        <div class="stat">
+            <p class="stat-label">Average Likes:</p>
+            <p class="stat-value">{{ stats.avg_likes | round(2) }}</p>
+        </div>
+        <div class="stat">
+            <p class="stat-label">Median Likes:</p>
+            <p class="stat-value">{{ stats.median_likes }}</p>
+        </div>
+        <div class="stat">
+            <p class="stat-label">Average Impressions:</p>
+            <p class="stat-value">{{ stats.avg_impressions | round(2) }}</p>
+        </div>
+        <div class="stat">
+            <p class="stat-label">Median Impressions:</p>
+            <p class="stat-value">{{ stats.median_impressions }}</p>
+        </div>
+        <div class="stat">
+            <p class="stat-label">Average Comments:</p>
+            <p class="stat-value">{{ stats.avg_comments | round(2) }}</p>
+        </div>
+        <div class="stat">
+            <p class="stat-label">Median Comments:</p>
+            <p class="stat-value">{{ stats.median_comments }}</p>
+        </div>
+    </div>
+
+    <h2>Posts in this Topic</h2>
+    <div class="posts-grid">
+        {% for post in posts %}
+        <a href="{{ url_for('show_post_details', post_id=post.post_id) }}" class="post-card">
+            {% if post.media_url and not post.media_url.startswith('http') %}
+            {% set extension = post.media_url.split('.')[-1].lower() %}
+            {% if extension in ['jpg', 'jpeg', 'png', 'gif'] %}
+            <img src="{{ url_for('static', filename='media/' + post.media_url) }}" alt="Post Media"
+                class="post-card__media">
+            {% elif extension in ['mp4', 'webm'] %}
+            <video controls class="post-card__media">
+                <source src="{{ url_for('static', filename='media/' + post.media_url) }}" type="video/{{ extension }}">
+                Your browser does not support the video tag.
+            </video>
+            {% endif %}
+            {% endif %}
+            <div class="post-card__caption">
+                <p>{{ post.caption[:150] }}...</p>
+            </div>
+            <div class="post-card__stats">
+                <span><i class="fas fa-eye"></i> {{ post.impressions }}</span>
+                <span><i class="fas fa-heart"></i> {{ post.likes }}</span>
+                <span><i class="fas fa-comment"></i> {{ post.comments }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <h1>Topic not found.</h1>
+    {% endif %}
+</div>
+{% endblock %}

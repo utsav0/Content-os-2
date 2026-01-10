@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.post_id }} - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/individual_post.css') }}">
+{% endblock %}
+
+{% block content %}
+{% if post %}
+<main class="container">
+    <section class="container__section section--left">
+        {% if post.media_url and not post.media_url.startswith('http') %}
+        {% set extension = post.media_url.split('.')[-1].lower() %}
+        {% if extension in ['jpg', 'jpeg', 'png', 'gif'] %}
+        <img src="{{ url_for('static', filename='media/' + post.media_url) }}" alt="Post Media"
+            class="post-media rounded-border-box">
+        {% elif extension in ['mp4', 'webm'] %}
+        <video controls class="post-media rounded-border-box">
+            <source src="{{ url_for('static', filename='media/' + post.media_url) }}" type="video/{{ extension }}">
+            Your browser does not support the video tag.
+        </video>
+        {% endif %}
+        {% endif %}
+
+        <div class="extra-details">
+            {% for topic in topics %}
+            <a href="/topic/{{ topic.id }}"
+                class="extra-details__item extra-details__item--topic hoverable-white nulled-link"><i
+                    class="fa-solid fa-tags"></i>{{ topic.name }}</a>
+            {% endfor %}
+            {% if most_recent_post_info %}
+            <a href="/post/{{ most_recent_post_info.post_id }}"
+                class="extra-details__item extra-details__item--last-posted hoverable-white nulled-link"><i
+                    class="fa-solid fa-calendar"></i>{{
+                most_recent_post_info.post_datetime }}</a>
+            {% endif %}
+        </div>
+        <div class="post-caption">
+            <p>
+                {{ post.caption}}
+            </p>
+        </div>
+    </section>
+    <section class="container__section section--right">
+        <div class="post__stats">
+            <h2>Stats:</h2>
+            <div class="post__stat">
+                <p class="post__stat-label">ID:</p>
+                <p class="post__stat-value">{{ post.post_id }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Date/Time:</p>
+                <p class="post__stat-value">{{ post.post_datetime }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Impressions:</p>
+                <p class="post__stat-value">{{ post.impressions }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Unique Impressions:</p>
+                <p class="post__stat-value">{{ post.members_reached }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Likes:</p>
+                <p class="post__stat-value">{{ post.likes }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Total Clicks:</p>
+                <p class="post__stat-value">{{ post.total_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">CTR:</p>
+                <p class="post__stat-value">
+                    {% if post.impressions and post.main_ebook_clicks and post.impressions > 0 %}
+                    {{ "%.2f"|format((post.main_ebook_clicks / post.impressions) * 100) }}%
+                    {% else %}
+                    -
+                    {% endif %}
+                </p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Main Ebook Clicks:</p>
+                <p class="post__stat-value">{{ post.main_ebook_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Lead Magnet Clicks:</p>
+                <p class="post__stat-value">{{ post.lead_magnet_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Comments:</p>
+                <p class="post__stat-value">{{ post.comments }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Profile View:</p>
+                <p class="post__stat-value">{{ post.profile_viewers }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Followers:</p>
+                <p class="post__stat-value">{{ post.followers_gained }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Reactions:</p>
+                <p class="post__stat-value">{{ post.reactions }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Reposts:</p>
+                <p class="post__stat-value">{{ post.reposts }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Saves:</p>
+                <p class="post__stat-value">{{ post.saves }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Sends:</p>
+                <p class="post__stat-value">{{ post.sends }}</p>
+            </div>
+        </div>
+        <a href="{{ post.post_url }}" target="_blank" class="individual_post_btn hoverable-white nulled-link">
+            <button class="btn btn--primary">See Live Post</button>
+        </a>
+        <a href="/add-post" class="individual_post_btn hoverable-white nulled-link">
+            <button class="btn btn--secondary">Add a Post</button>
+        </a>
+    </section>
+</main>
+
+<section class="similar-posts-container">
+    <h2>Similar Posts</h2>
+    <div class="similar-posts">
+        {% for similar_post in similar_posts %}
+        <a href="{{ url_for('show_post_details', post_id=similar_post.post_id) }}"
+            class="similar-posts__card hoverable-white nulled-link">
+            {% if similar_post.media_url and not similar_post.media_url.startswith('http') %}
+            {% set extension = similar_post.media_url.split('.')[-1].lower() %}
+            {% if extension in ['jpg', 'jpeg', 'png', 'gif'] %}
+            <img src="{{ url_for('static', filename='media/' + similar_post.media_url) }}" alt="Similar post media"
+                class="similar-posts__media centered-grid">
+            {% elif extension in ['mp4', 'webm'] %}
+            <video controls class="similar-posts__media centered-grid">
+                <source src="{{ url_for('static', filename='media/' + similar_post.media_url) }}"
+                    type="video/{{ extension }}">
+                Your browser does not support the video tag.
+            </video>
+            {% endif %}
+            {% endif %}
+            <div class="similar-posts__caption">
+                <p>{{ similar_post.caption[:100] }}...</p>
+            </div>
+            <div class="similar-posts__stats">
+                <span><i class="fas fa-eye"></i> {{ similar_post.impressions }}</span>
+                <span><i class="fas fa-heart"></i> {{ similar_post.likes }}</span>
+                <span><i class="fas fa-comment"></i> {{ similar_post.comments }}</span>
+                <span><i class="fas fa-retweet"></i> {{ similar_post.reposts }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% else %}
+<h1>Post not found.</h1>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/individual_post.js') }}"></script>
+{% endblock %}

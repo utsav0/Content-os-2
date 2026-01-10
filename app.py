@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
 import mysql.connector
 from contextlib import contextmanager
@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
+import statistics
+import file_handler
+
 
 # Load environment
 load_dotenv()
@@ -54,6 +57,88 @@ def home():
 @app.route("/posts")
 def posts():
     return render_template("posts.html")
+
+# Individual post details page
+@app.route("/post/<int:post_id>")
+def show_post_details(post_id):
+    app.logger.info(f"Request received for post ID: {post_id}")
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            
+            # Fetch the main post
+            cursor.execute("SELECT * FROM posts WHERE post_id = %s", (post_id,))
+            post = cursor.fetchone()
+
+            if not post:
+                return "Post not found", 404
+
+            if post and post.get('post_datetime'):
+                post['post_datetime'] = post['post_datetime'].strftime('%d %B %Y')
+
+            # Fetch topics for the current post
+            cursor.execute("""
+                SELECT t.id, t.name
+                FROM topics t
+                JOIN topic_posts tp ON t.id = tp.topic_id
+                WHERE tp.post_id = %s
+            """, (post_id,))
+            topics = cursor.fetchall()
+
+            # Fetch similar posts
+            cursor.execute("""
+                SELECT p.post_id, p.media_url, p.caption, p.impressions, p.likes, p.comments, p.reposts
+                FROM posts p
+                JOIN topic_posts tp ON p.post_id = tp.post_id
+                WHERE tp.topic_id IN (
+                    SELECT topic_id FROM topic_posts WHERE post_id = %s
+                ) AND p.post_id != %s
+                GROUP BY p.post_id
+                ORDER BY p.post_datetime DESC
+                LIMIT 10
+            """, (post_id, post_id))
+            similar_posts = cursor.fetchall()
+
+            # Fetch the most recent post date among similar posts
+            most_recent_post_info = None
+            if similar_posts:
+                cursor.execute("""
+                    SELECT p.post_id, p.post_datetime
+                    FROM posts p
+                    JOIN topic_posts tp ON p.post_id = tp.post_id
+                    WHERE tp.topic_id IN (
+                        SELECT topic_id FROM topic_posts WHERE post_id = %s
+                    )
+                    ORDER BY p.post_datetime DESC
+                    LIMIT 1
+                """, (post_id,))
+                most_recent_post_info = cursor.fetchone()
+                if most_recent_post_info and most_recent_post_info.get('post_datetime'):
+                    most_recent_post_info['post_datetime'] = most_recent_post_info['post_datetime'].strftime('%d %B %Y')
+
+            return render_template('individual_post.html', post=post, topics=topics, similar_posts=similar_posts, most_recent_post_info=most_recent_post_info)
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error: {err}")
+        return "Database error", 500
+
+
+@app.route("/add-post", methods=['GET', 'POST'])
+def add_post():
+    error = None
+    if request.method == 'POST':
+        files = request.files.getlist('file-upload')
+        if not files or not files[0].filename:
+            error = "No file selected."
+        else:
+            result = file_handler.handle_files(files)
+            print("Result from file handler:", result)
+            if isinstance(result, dict): 
+                session['last_upload'] = result 
+                return redirect(url_for('confirm_upload_post'))
+            else:
+                error = result 
+    return render_template("add_post.html", error=error)
 
 
 # API routes
@@ -191,6 +276,125 @@ def api_posts():
     except mysql.connector.Error as err:
         app.logger.error(f"Database error: {err}")
         return jsonify({"error": "Database error"}), 500
+    
+
+@app.route("/topic/<int:topic_id>")
+def show_topic_details(topic_id):
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+
+            # Fetch topic details
+            cursor.execute("SELECT * FROM topics WHERE id = %s", (topic_id,))
+            topic = cursor.fetchone()
+
+            if not topic:
+                return "Topic not found", 404
+
+            # Fetch all posts for this topic
+            cursor.execute("""
+                SELECT p.*
+                FROM posts p
+                JOIN topic_posts tp ON p.post_id = tp.post_id
+                WHERE tp.topic_id = %s
+                ORDER BY p.post_datetime DESC
+            """, (topic_id,))
+            posts = cursor.fetchall()
+
+            # Fetch relevant topics
+            cursor.execute("""
+                SELECT t.id, t.name, COUNT(t.id) as post_count
+                FROM topics t
+                JOIN topic_posts tp ON t.id = tp.topic_id
+                WHERE tp.post_id IN (
+                    SELECT post_id FROM topic_posts WHERE topic_id = %s
+                ) AND t.id != %s
+                GROUP BY t.id, t.name
+                ORDER BY post_count DESC
+                LIMIT 10
+            """, (topic_id, topic_id))
+            relevant_topics = cursor.fetchall()
+
+            total_posts = len(posts)
+            last_post_date = ""
+            if posts:
+                last_post_date = posts[0]['post_datetime'].strftime('%d %B %Y')
+
+            # Calculate stats
+            likes = [p['likes'] for p in posts if p['likes'] is not None]
+            impressions = [p['impressions'] for p in posts if p['impressions'] is not None]
+            comments = [p['comments'] for p in posts if p['comments'] is not None]
+
+            stats = {
+                'avg_likes': statistics.mean(likes) if likes else 0,
+                'median_likes': statistics.median(likes) if likes else 0,
+                'avg_impressions': statistics.mean(impressions) if impressions else 0,
+                'median_impressions': statistics.median(impressions) if impressions else 0,
+                'avg_comments': statistics.mean(comments) if comments else 0,
+                'median_comments': statistics.median(comments) if comments else 0,
+            }
+
+            return render_template('topic.html',
+                                   topic=topic,
+                                   posts=posts,
+                                   total_posts=total_posts,
+                                   last_post_date=last_post_date,
+                                   stats=stats,
+                                   relevant_topics=relevant_topics)
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error in topic details: {err}")
+        return "Database error", 500
+
+#Download all the post data as JSON
+@app.route("/download")
+def download_data():
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+
+            # Fetch all posts
+            cursor.execute("SELECT * FROM posts")
+            posts = cursor.fetchall()
+
+            # Fetch all topics and group them by post_id
+            cursor.execute("""
+                SELECT tp.post_id, t.name
+                FROM topics t
+                JOIN topic_posts tp ON t.id = tp.topic_id
+            """)
+            topic_data = cursor.fetchall()
+            
+            topics_by_post = {}
+            for row in topic_data:
+                post_id = row['post_id']
+                if post_id not in topics_by_post:
+                    topics_by_post[post_id] = []
+                topics_by_post[post_id].append(row['name'])
+
+            # Combine posts with their topics
+            for post in posts:
+                post_id = post['post_id']
+                post['topics'] = topics_by_post.get(post_id, [])
+                if post.get('post_datetime'):
+                    post['post_datetime'] = post['post_datetime'].isoformat()
+
+            # Create a JSON response
+            response = jsonify(posts)
+            response.headers['Content-Disposition'] = 'attachment; filename=posts.json'
+            return response
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error: {err}")
+        return jsonify({"error": "Database error"}), 500
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Not found"}), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({"error": "Internal server error"}), 500
 
 #Server entry point
 if __name__ == "__main__":

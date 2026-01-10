@@ -2,6 +2,9 @@ body {
     display: grid;
     place-items: center;
     min-height: 100vh;
+
+    /* Removing reserved space for navbar */
+    margin-top: 0;
 }
 
 main {

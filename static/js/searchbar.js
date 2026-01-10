@@ -1,4 +1,8 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 const searchInput = document.getElementById("search-input");
+
+
 const suggestionsContainer = document.getElementById("search-suggestions");
 
 // Debounce helper
@@ -51,3 +55,5 @@ const fetchSuggestions = async (query) => {
 searchInput.addEventListener("input", debounce((e) => {
     fetchSuggestions(e.target.value.trim());
 }, 150));
+    
+});
