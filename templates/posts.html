@@ -38,6 +38,12 @@
                 <input type="date" class="filter-form__input" id="date-to" name="date_to">
             </div>
 
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="latest-date-from">Latest Post Date</label>
+                <input type="date" class="filter-form__input" id="latest-date-from" name="latest_date_from">
+                <input type="date" class="filter-form__input" id="latest-date-to" name="latest_date_to">
+            </div>
+
             <div class="filter-form__row filter-form__row--actions">
                 <button type="button" class="filter-form__button btn btn--secondary" id="clear-filters">Clear
                     Filters</button>
@@ -66,6 +72,9 @@
         <div class="header__dates">
             <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-dates"></i>
         </div>
+        <div class="header__latest_post_dates">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-latest-dates"></i>
+        </div>
     </div>
     <div id="posts-container" class="data-container__item data-container__item--post-container">
         {% for post in posts %}
@@ -83,6 +92,7 @@
                 </span>
                 <span><i class="fa-solid fa-mouse-pointer"></i> {{ post.main_ebook_clicks }}</span>
                 <span><i class="fa-solid fa-calendar"></i> {{ post.post_datetime }}</span>
+                <span><i class="fa-solid fa-clock"></i> {{ post.latest_post_datetime }}</span>
             </div>
         </div>
         {% endfor %}

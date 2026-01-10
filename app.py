@@ -109,15 +109,24 @@ def api_posts():
         impressions_max = request.args.get("impressions_max")
         comments_min = request.args.get("comments_min")
         comments_max = request.args.get("comments_max")
+        latest_date_from = request.args.get("latest_date_from")
+        latest_date_to = request.args.get("latest_date_to")
 
-        # Whitelist to prevent injection
-        valid_sort_columns = ["post_datetime", "likes", "comments", "impressions", "main_ebook_ctr", "main_ebook_clicks"]
+        valid_sort_columns = ["post_datetime", "likes", "comments", "impressions", "main_ebook_ctr", "main_ebook_clicks", "latest_post_datetime"]
         if sort_by not in valid_sort_columns:
             sort_by = "post_datetime"
         if sort_order not in ["ASC", "DESC"]:
             sort_order = "DESC"
 
-        query = """SELECT post_id, caption, impressions, likes, comments, post_datetime, main_ebook_ctr, main_ebook_clicks
+        query = """SELECT post_id, caption, impressions, likes, comments, post_datetime, main_ebook_ctr, main_ebook_clicks,
+                   (SELECT MAX(p2.post_datetime) 
+                    FROM posts p2 
+                    JOIN topic_posts tp2 ON p2.post_id = tp2.post_id 
+                    WHERE tp2.topic_id IN (
+                        SELECT tp1.topic_id 
+                        FROM topic_posts tp1 
+                        WHERE tp1.post_id = posts.post_id
+                    )) as latest_post_datetime
                    FROM posts WHERE 1=1"""
         params = []
 
@@ -146,6 +155,17 @@ def api_posts():
             query += " AND comments <= %s"
             params.append(comments_max)
 
+        having_clauses = []
+        if latest_date_from:
+            having_clauses.append("latest_post_datetime >= %s")
+            params.append(latest_date_from)
+        if latest_date_to:
+            having_clauses.append("latest_post_datetime <= %s")
+            params.append(latest_date_to)
+
+        if having_clauses:
+            query += " HAVING " + " AND ".join(having_clauses)
+
         query += f" ORDER BY {sort_by} {sort_order} LIMIT %s OFFSET %s"
         params.extend([limit, offset])
 
@@ -160,6 +180,11 @@ def api_posts():
 
                 if post.get("post_datetime"):
                     post["post_datetime"] = post["post_datetime"].strftime("%d %B %Y")
+                
+                if post.get("latest_post_datetime"):
+                    post["latest_post_datetime"] = post["latest_post_datetime"].strftime("%d %B %Y")
+                else:
+                    post["latest_post_datetime"] = "-"
 
             return jsonify(posts)
 

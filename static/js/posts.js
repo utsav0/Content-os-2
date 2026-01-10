@@ -22,6 +22,7 @@
             likes: document.getElementById('sort-likes'),
             comments: document.getElementById('sort-comments'),
             date: document.getElementById('sort-dates'),
+            latest_date: document.getElementById('sort-latest-dates'),
             ctr: document.getElementById('sort-ctr'),
             clicks: document.getElementById('sort-clicks')
         },
@@ -33,7 +34,9 @@
             comments_min: document.getElementById('comments-from'),
             comments_max: document.getElementById('comments-to'),
             date_from: document.getElementById('date-from'),
-            date_to: document.getElementById('date-to')
+            date_to: document.getElementById('date-to'),
+            latest_date_from: document.getElementById('latest-date-from'),
+        latest_date_to: document.getElementById('latest-date-to')
         }
     };
 
@@ -70,9 +73,8 @@
                         <span><i class="fa-solid fa-rocket"></i> ${post.main_ebook_ctr !== null ? post.main_ebook_ctr : '-'}</span>
                         <span><i class="fa-solid fa-mouse-pointer"></i> ${post.main_ebook_clicks !== null ? post.main_ebook_clicks : '-'}</span>
                         <span><i class="fa-solid fa-calendar"></i> ${post.post_datetime}</span>
+                        <span><i class="fa-solid fa-clock"></i> ${post.latest_post_datetime}</span>
                     `;
-                    console.log("main ebook ctr: ", post.main_ebook_ctr);
-                    
 
                     postEl.appendChild(caption);
                     postEl.appendChild(stats);
@@ -154,6 +156,7 @@
         setupSortButton(DOM.sortButtons.likes, 'likes');
         setupSortButton(DOM.sortButtons.comments, 'comments');
         setupSortButton(DOM.sortButtons.date, 'post_datetime');
+        setupSortButton(DOM.sortButtons.latest_date, 'latest_post_datetime');
         setupSortButton(DOM.sortButtons.ctr, 'main_ebook_ctr');
         setupSortButton(DOM.sortButtons.clicks, 'main_ebook_clicks');
 

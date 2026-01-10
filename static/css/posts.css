@@ -1,6 +1,6 @@
 main.data-container {
     display: grid;
-    grid-template-columns: 1fr repeat(6, auto);
+    grid-template-columns: 1fr repeat(7, auto);
     column-gap: var(--common-spacing);
     padding: var(--common-spacing);
     background-color: var(--clr-bg);
