@@ -121,6 +121,10 @@ def handle_file(file_path):
             None
         )
         main_ebook_clicks = _to_int(data.get(main_ebook_clicks_key, 0)) if main_ebook_clicks_key else 0
+        impressions = _to_int(data.get('Impressions', 0))
+        ctr = 0
+        if impressions > 0:
+            ctr = (main_ebook_clicks / impressions) * 100
 
         transformed_data = {
             'post_id': post_id,
@@ -134,6 +138,7 @@ def handle_file(file_path):
             'members_reached': _to_int(data.get('Members reached', 0)),
             'total_clicks': _to_int(data.get('Visits to links in this post', 0)),
             'main_ebook_clicks': main_ebook_clicks,
+            'main_ebook_ctr': ctr,
             'lead_magnet_clicks': 0,
             'profile_viewers': _to_int(data.get('Profile viewers from this post', 0)),
             'followers_gained': _to_int(data.get('Followers gained from this post', 0)),
