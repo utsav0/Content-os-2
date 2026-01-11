@@ -1,0 +1,102 @@
+.tags-input-bar {
+    width: 50%;
+    position: relative;
+    outline: 1.5px solid transparent;
+    transition: outline-color 0.3s ease;
+    display: flex;
+    flex-wrap: wrap;
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+.tags-input-bar:focus-within {
+    outline-color: color-mix(in hsl, var(--clr-border-neon), white 20%);
+}
+
+.tags-input-bar__input {
+    width: 100%;
+    height: 2.5rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding-left: 1rem;
+    color: var(--clr-p);
+}
+
+.tags-input-bar__search-suggestions {
+    width: 100%;
+    max-height: 300px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    position: absolute;
+    top: calc(100% + 2px);
+    overflow: scroll;
+    background-color: var(--clr-bg);
+    z-index: 1;
+}
+
+.tags-input-bar__search-suggestions:empty{
+    display: none;
+}
+
+.suggestion-item {
+    color: color-mix(in hsl, var(--clr-p), transparent 30%);
+    height: 1.2lh;
+}
+
+.suggestion-item--topic::before {
+    content: "Topic: ";
+    --local-color: var(--clr-topic);
+}
+
+.suggestion-item::before {
+    background: color-mix(in hsl, var(--local-color), transparent 75%);
+    padding: 1px 8px;
+    border-radius: 20rem;
+    margin-right: 1ch;
+    font-size: 0.8em;
+    border: 1px solid color-mix(in hsl, var(--local-color), transparent 35%);
+    display: inline-block;
+}
+
+.suggestion-item {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 80%;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.suggestion-item:hover {
+    color: var(--clr-p);
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.tags-container.hidden {
+    display: none;
+}
+
+.tag {
+    padding: 0.3rem 0.6rem;
+    display: flex;
+    gap: 0.3rem; 
+    /* background-color: var(--clr-bg2);
+    color: var(--clr-p);
+    border-radius: 20rem;
+    align-items: center;
+    border: 1px solid var(--clr-border-neon);
+    */
+}
+
+.tag__remove-btn {
+    all: unset;
+    cursor: pointer;
+}

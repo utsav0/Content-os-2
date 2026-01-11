@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Upload Post - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/individual_post.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/confirm_upload_post.css') }}">
+{% endblock %}
+
+{% block content %}
+{% if parsed_data %}
+<p class="queue_data">
+    <span class="queue_index"><b>Queue file {{queue_count}}: </b></span>
+    <span>Post Number :{{filename}}</span>
+</p>
+<main class="container">
+    <section class="container__section section--left">
+        {% if parsed_data.media_url and not parsed_data.media_url.startswith('http') %}
+        {% set extension = parsed_data.media_url.split('.')[-1].lower() %}
+        {% if extension in ['jpg', 'jpeg', 'png', 'gif'] %}
+        <img src="{{ url_for('static', filename='media/' + parsed_data.media_url) }}" alt="Post Media"
+            class="post-media rounded-border-box">
+        {% elif extension in ['mp4', 'webm'] %}
+        <video controls class="post-media rounded-border-box">
+            <source src="{{ url_for('static', filename='media/' + parsed_data.media_url) }}" type="video/{{ extension }}">
+            Your browser does not support the video tag.
+        </video>
+        {% endif %}
+        {% endif %}
+
+
+        <div class="extra-details extra-details--topic-inp">
+            <div class="extra-details__item extra-details__item--topic tags-input-bar rounded-border-box">
+                <div class="tags-container"></div>
+                <input type="text" name="tags" placeholder="Enter tags separated by commas"
+                    class="tags-input-bar__input">
+            </div>
+        </div>
+        <div class="post-caption">
+            <p>
+                {{ parsed_data.caption}}
+            </p>
+        </div>
+    </section>
+    <section class="container__section section--right">
+        <div class="post__stats">
+            <h2>Stats:</h2>
+            <div class="post__stat">
+                <p class="post__stat-label">ID:</p>
+                <p class="post__stat-value">{{ parsed_data.post_id }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Date/Time:</p>
+                <p class="post__stat-value">{{ parsed_data.post_datetime }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Impressions:</p>
+                <p class="post__stat-value">{{ parsed_data.impressions }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Unique Impressions:</p>
+                <p class="post__stat-value">{{ parsed_data.members_reached }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Likes:</p>
+                <p class="post__stat-value">{{ parsed_data.likes }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Total Clicks:</p>
+                <p class="post__stat-value">{{ parsed_data.total_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Main Ebook Clicks:</p>
+                <p class="post__stat-value">{{ parsed_data.main_ebook_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Lead Magnet Clicks:</p>
+                <p class="post__stat-value">{{ parsed_data.lead_magnet_clicks }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Comments:</p>
+                <p class="post__stat-value">{{ parsed_data.comments }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Profile View:</p>
+                <p class="post__stat-value">{{ parsed_data.profile_viewers }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Followers:</p>
+                <p class="post__stat-value">{{ parsed_data.followers_gained }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Reactions:</p>
+                <p class="post__stat-value">{{ parsed_data.reactions }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Reposts:</p>
+                <p class="post__stat-value">{{ parsed_data.reposts }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Saves:</p>
+                <p class="post__stat-value">{{ parsed_data.saves }}</p>
+            </div>
+            <div class="post__stat">
+                <p class="post__stat-label">Sends:</p>
+                <p class="post__stat-value">{{ parsed_data.sends }}</p>
+            </div>
+        </div>
+        <div class="btn btn--primary">Save to Database</div>
+        <a href="{{ url_for('add_post') }}" class="hoverable-white nulled-link">
+            <div class="btn btn--secondary">Add a Different Post</div>
+        </a>
+    </section>
+</main>
+{% else %}
+<h1>No data to display.</h1>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const postData = {{ parsed_data | tojson | safe }};
+</script>
+<script src="{{ url_for('static', filename='js/confirm_upload_post.js') }}"></script>
+{% endblock %}

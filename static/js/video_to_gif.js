@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form) return;
 
     form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Stop standard form submission
+        e.preventDefault();
 
         // 1. Update UI to show processing
         const originalBtnText = submitBtn.textContent;
@@ -17,17 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(form);
 
         try {
-            // 2. Send data via Fetch
             const response = await fetch('/video-to-gif', {
                 method: 'POST',
                 body: formData
             });
 
-            // Check if the response is the GIF image
             const contentType = response.headers.get('content-type');
 
             if (response.ok && contentType && contentType.includes('image/gif')) {
-                // 3. Create a blob from the response
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 
@@ -35,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const a = document.createElement('a');
                 a.href = url;
                 
-                // Try to get the filename from headers, or fallback to default
                 const disposition = response.headers.get('content-disposition');
                 let filename = 'converted.gif';
                 if (disposition && disposition.indexOf('filename=') !== -1) {
@@ -44,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         filename = matches[1].replace(/['"]/g, '');
                     }
                 } else if (fileInput.files[0]) {
-                    // Fallback: use original name + .gif
                     const originalName = fileInput.files[0].name;
                     filename = originalName.replace(/\.[^/.]+$/, "") + ".gif";
                 }
@@ -55,10 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.remove();
                 window.URL.revokeObjectURL(url);
 
-                // 5. RESET THE FORM
                 form.reset();
             } else {
-                // Handle errors (e.g., if the server returned the HTML error page)
                 alert("An error occurred during conversion. Please check the file format and try again.");
             }
 
@@ -66,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err);
             alert("A network error occurred.");
         } finally {
-            // 6. Restore Button State
             submitBtn.textContent = originalBtnText;
             submitBtn.disabled = false;
             submitBtn.style.cursor = 'pointer';

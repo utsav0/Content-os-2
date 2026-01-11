@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, after_this_request
+from errno import errorcode
+from flask import Flask, current_app, flash, render_template, request, jsonify, session, redirect, url_for, send_file, after_this_request
 from flask_cors import CORS
 import mysql.connector
 from contextlib import contextmanager
@@ -124,7 +125,6 @@ def show_post_details(post_id):
         app.logger.error(f"Database error: {err}")
         return "Database error", 500
 
-
 @app.route("/add-post", methods=['GET', 'POST'])
 def add_post():
     error = None
@@ -133,14 +133,61 @@ def add_post():
         if not files or not files[0].filename:
             error = "No file selected."
         else:
-            result = file_handler.handle_files(files)
-            print("Result from file handler:", result)
-            if isinstance(result, dict): 
-                session['last_upload'] = result 
+            try:
+                upload_folder = os.path.join(app.root_path, 'temp_uploads', 'user_uploads')
+                os.makedirs(upload_folder, exist_ok=True)
+
+                post_files_queue = []
+
+                for file in files:
+                    if file.filename:
+                        filename = secure_filename(file.filename)
+                        save_path = os.path.join(upload_folder, filename)
+                        file.save(save_path)
+                        post_files_queue.append(filename)
+
+                session['post_files_queue'] = post_files_queue
+                session.modified = True
+                
                 return redirect(url_for('confirm_upload_post'))
-            else:
-                error = result 
+
+            except Exception as e:
+                app.logger.error(f"Error saving files: {e}")
+                error = "An error occurred while saving your files."
     return render_template("add_post.html", error=error)
+
+@app.route("/confirm-upload-post", methods=['GET'])
+def confirm_upload_post():
+    post_files_queue = session.get('post_files_queue', [])
+
+    if not post_files_queue:
+        flash("All files processed! Upload more?")
+        return redirect(url_for('add_post'))
+
+    current_filename = post_files_queue[0]
+    upload_folder = os.path.join(app.root_path, 'temp_uploads', 'user_uploads')
+    file_path = os.path.join(upload_folder, current_filename)
+
+    if not os.path.exists(file_path):
+        post_files_queue.pop(0)
+        session['post_files_queue'] = post_files_queue
+        session.modified = True
+        return redirect(url_for('confirm_upload_post'))
+
+    try:
+        parsed_data = file_handler.handle_file(file_path)
+    except Exception as e:
+        app.logger.error(f"Error parsing file: {e}")
+        parsed_data = {"error": "Could not parse file data"}
+
+    return render_template(
+        "confirm_upload_post.html", 
+        filename=current_filename, 
+        parsed_data=parsed_data,
+        queue_count=len(post_files_queue)
+    )
+
+
 
 # Video to gif: 
 @app.route("/video-to-gif", methods=['GET', 'POST'])
@@ -155,7 +202,6 @@ def video_to_gif_page():
 
         if file:
             try:
-                # Setup paths
                 filename = secure_filename(file.filename)
                 # Create a temporary directory if it doesn't exist
                 temp_dir = os.path.join(app.root_path, 'temp_uploads')
@@ -168,8 +214,6 @@ def video_to_gif_page():
                 palette_path = f"{base_name}_palette.png"
                 output_gif_path = f"{base_name}.gif"
 
-                # === Conversion Logic (Adapted from your script) ===
-                
                 # Step 1: Generate optimal palette
                 palette_cmd = [
                     "ffmpeg", "-y", "-i", input_path,
@@ -186,8 +230,6 @@ def video_to_gif_page():
 
                 subprocess.run(palette_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 subprocess.run(gif_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-                # === Cleanup & Send ===
 
                 # Schedule cleanup of files after the response is sent
                 @after_this_request
@@ -350,8 +392,7 @@ def api_posts():
 
     except mysql.connector.Error as err:
         app.logger.error(f"Database error: {err}")
-        return jsonify({"error": "Database error"}), 500
-    
+        return jsonify({"error": "Database error"}), 500 
 
 @app.route("/topic/<int:topic_id>")
 def show_topic_details(topic_id):
@@ -463,6 +504,96 @@ def download_data():
         app.logger.error(f"Database error: {err}")
         return jsonify({"error": "Database error"}), 500
 
+#Get topic suggestions for confirm post: 
+@app.route("/api/topics")
+def api_topics():
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id, name FROM topics")
+            topics = cursor.fetchall()
+            return jsonify(topics)
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error: {err}")
+        return jsonify({"error": "Database error"}), 500
+
+#Save post after confirmation
+@app.route("/api/save-post", methods=['POST'])
+def save_post():
+    data = request.get_json()
+    post_data = data.get('post_data')
+    tags = data.get('tags')
+
+    if not post_data or not tags:
+        return jsonify({"error": "Missing data"}), 400
+
+    def cleanup_current_file():
+        try:
+            queue = session.get('post_files_queue', [])
+            if queue:
+                filename = queue.pop(0)
+                session['post_files_queue'] = queue
+                session.modified = True
+                
+                upload_folder = os.path.join(current_app.root_path, 'temp_uploads', 'user_uploads')
+                file_path = os.path.join(upload_folder, filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    current_app.logger.info(f"Cleaned up file: {filename}")
+        except Exception as e:
+            current_app.logger.error(f"Error during file cleanup: {e}")
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            conn.start_transaction()
+
+            try:
+                post_columns = [key for key in post_data.keys() if key != 'media_url']
+                post_values = [post_data[key] for key in post_columns]
+                
+                if 'media_url' in post_data and post_data['media_url']:
+                    post_columns.append('media_url')
+                    post_values.append(post_data['media_url'])
+
+                query = f"INSERT INTO posts ({', '.join(post_columns)}) VALUES ({', '.join(['%s'] * len(post_columns))})"
+                cursor.execute(query, post_values)
+                post_id = post_data['post_id']
+
+                topic_ids = []
+                for tag in tags:
+                    cursor.execute("SELECT id FROM topics WHERE name = %s", (tag,))
+                    result = cursor.fetchone()
+                    if result:
+                        topic_ids.append(result[0])
+                    else:
+                        cursor.execute("INSERT INTO topics (name) VALUES (%s)", (tag,))
+                        topic_ids.append(cursor.lastrowid)
+
+                for topic_id in topic_ids:
+                    cursor.execute("INSERT INTO topic_posts (post_id, topic_id) VALUES (%s, %s)", (post_id, topic_id))
+
+                conn.commit()
+                
+                cleanup_current_file()
+                return jsonify({"success": True, "post_id": post_id}), 201
+
+            except mysql.connector.Error as err:
+                conn.rollback()
+                
+                if err.errno == 1062: # 1062 is the standard MySQL code for Duplicate Entry
+                    app.logger.warning(f"Duplicate post skipped: {err}")
+                    cleanup_current_file() 
+                    return jsonify({"error": "Post already exists in database. File skipped.", "code": "DUPLICATE"}), 409
+                
+                # --- OTHER DB ERRORS ---
+                app.logger.error(f"Database transaction error: {err}")
+                return jsonify({"error": "Database error during transaction"}), 500
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database connection error: {err}")
+        return jsonify({"error": "Database connection error"}), 500
+
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({"error": "Not found"}), 404
@@ -473,4 +604,6 @@ def server_error(e):
 
 #Server entry point
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
+
+    
