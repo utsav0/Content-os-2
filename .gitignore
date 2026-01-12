@@ -3,5 +3,5 @@ raw-data/
 static/media/
 __pycache__/
 *.pyc
-*.log
+*.log*
 .env
