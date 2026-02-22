@@ -1,4 +1,3 @@
-from errno import errorcode
 from flask import Flask, current_app, flash, render_template, request, jsonify, session, redirect, url_for, send_file, after_this_request
 from flask_cors import CORS
 import mysql.connector
@@ -10,8 +9,10 @@ from logging.handlers import RotatingFileHandler
 import sys
 import statistics
 import file_handler
+import ask_ai
 import subprocess
 from werkzeug.utils import secure_filename
+import threading
 
 
 # Load environment
@@ -51,6 +52,22 @@ def get_db_connection():
         if conn and conn.is_connected():
             conn.close()
 
+read_only_db_config = {
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("READ_ONLY_DB_USER"),
+    "password": os.getenv("READ_ONLY_DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
+}
+
+@contextmanager
+def get_read_only_db_connection():
+    conn = None
+    try:
+        conn = mysql.connector.connect(**read_only_db_config)
+        yield conn
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
 # Page routes
 
 @app.route("/")
@@ -187,9 +204,6 @@ def confirm_upload_post():
         queue_count=len(post_files_queue)
     )
 
-
-
-# Video to gif: 
 @app.route("/video-to-gif", methods=['GET', 'POST'])
 def video_to_gif_page():
     if request.method == 'POST':
@@ -257,6 +271,10 @@ def video_to_gif_page():
                 return render_template('video_to_gif.html', error=f"An error occurred: {str(e)}")
 
     return render_template('video_to_gif.html')
+
+@app.route("/ask-ai", methods=['GET'])
+def ask_ai_page():
+    return render_template("ask_ai.html")
 
 # API routes
 
@@ -593,6 +611,72 @@ def save_post():
     except mysql.connector.Error as err:
         app.logger.error(f"Database connection error: {err}")
         return jsonify({"error": "Database connection error"}), 500
+
+@app.route("/api/ask-ai-query", methods=['POST'])
+def ask_ai_query():
+    data = request.get_json()
+    user_question = data.get("question")
+
+    if not user_question:
+        return jsonify({"error": "No question provided"}), 400
+
+    try:
+        sql_query = ask_ai.generate_sql(user_question)
+        
+        if not sql_query.upper().strip().startswith("SELECT"):
+            return jsonify({
+                "error": "The AI generated an invalid or unsafe query.", 
+                "sql": sql_query
+            }), 400
+
+        with get_read_only_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(sql_query)
+            results = cursor.fetchall()
+            
+            return jsonify({
+                "sql": sql_query,
+                "data": results
+            })
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Read-Only Database error: {err}")
+        return jsonify({"error": str(err), "sql": sql_query}), 500
+    except Exception as e:
+        app.logger.error(f"AI/Server Error: {e}")
+        return jsonify({"error": "Failed to process the question with AI."}), 500
+
+def run_media_sync(app_instance):
+    with app_instance.app_context():
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("SELECT post_id, post_url FROM posts WHERE post_datetime > '2025-12-10 23:59:59'")
+                # Hardcoded date for now, but you can change it as needed.
+                rows = cursor.fetchall()
+
+                media_dir = os.path.join(app_instance.root_path, 'static', 'media')
+                if not os.path.exists(media_dir):
+                    os.makedirs(media_dir)
+
+                existing_files = os.listdir(media_dir)
+
+                for row in rows:
+                    p_id = str(row['post_id'])
+                    if not any(f.startswith(p_id) for f in existing_files):
+                        app_instance.logger.info(f"Downloading missing media for: {p_id}")
+                        file_handler.download_media_by_id(row['post_url'], p_id)
+            
+            app_instance.logger.info("Sync Complete.")
+        except Exception as e:
+            app_instance.logger.error(f"Sync failed: {e}")
+
+@app.route("/api/sync-media")
+def sync_media():
+    thread = threading.Thread(target=run_media_sync, args=(app,)) 
+    thread.daemon = True
+    thread.start()
+    return jsonify({"message": "Sync started in background. Check your terminal logs."}), 202
 
 @app.errorhandler(404)
 def not_found(e):

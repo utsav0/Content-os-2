@@ -33,7 +33,15 @@
                     <a href="/add-post" class="nav__link hoverable-white nulled-link">Add Posts</a>
                 </li>
                 <li class="nav__item">
+                    <a href="/api/sync-media" id="sync-link" class="nav__link hoverable-white nulled-link">Sync Media</a>
+                </li>
+                <li class="nav__item">
                     <a href="/video-to-gif" class="nav__link hoverable-white nulled-link">Video to GIF</a>
+                </li>
+                <li class="nav__item nav__item--icon nav__item--icon--ask-ai">
+                    <a href="/ask-ai" class="nav__link hoverable-white nulled-link">
+                        Ask AI
+                    </a>
                 </li>
                 <li class="nav__item nav__item--icon nav__item--icon--download">
                     <a href="/download" class="nav__link hoverable-white nulled-link">
@@ -55,6 +63,7 @@
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/searchbar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
     {% block content %}{% endblock %}
 
     <!-- Page-specific scripts -->

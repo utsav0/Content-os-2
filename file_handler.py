@@ -7,6 +7,40 @@ from bs4 import BeautifulSoup
 import re
 import os
 
+#Standalone function to download media from a URL using post_id as filename
+def download_media_by_id(post_url, post_id):
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        resp = requests.get(post_url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, 'html.parser')
+
+        media_meta = soup.find('meta', property='og:image')
+        media_url = media_meta['content'] if media_meta and media_meta.get('content') else None
+
+        if media_url:
+            media_response = requests.get(media_url, headers=headers, timeout=20)
+            media_response.raise_for_status()
+
+            content_type = media_response.headers.get('content-type', '').split(';')[0].lower()
+            mapping = {
+                'image/gif': '.gif', 'image/png': '.png',
+                'image/jpeg': '.jpeg', 'image/jpg': '.jpeg',
+                'video/mp4': '.mp4', 'image/webp': '.webp'
+            }
+            ext = mapping.get(content_type, os.path.splitext(media_url.split('?')[0])[-1].lower() or '.jpeg')
+            
+            save_dir = os.path.join('static', 'media')
+            os.makedirs(save_dir, exist_ok=True)
+            save_path = os.path.join(save_dir, f"{post_id}{ext}")
+            
+            with open(save_path, 'wb') as f:
+                f.write(media_response.content)
+            return f"{post_id}{ext}"
+    except Exception as e:
+        print(f"Sync error for {post_id}: {e}")
+    return None
+
 def _to_int(value):
     try:
         if pd.isna(value):
@@ -71,34 +105,7 @@ def handle_file(file_path):
                 og_desc = soup.find('meta', property='og:description')
                 caption = og_desc['content'].strip() if og_desc and og_desc.get('content') else None
 
-            media_meta = soup.find('meta', property='og:image')
-            media_url = media_meta['content'] if media_meta and media_meta.get('content') else None
-
-            if media_url and post_id:
-                media_response = requests.get(media_url, headers=headers, timeout=10)
-                media_response.raise_for_status()
-
-                content_type = media_response.headers.get('content-type', '').split(';')[0].lower()
-                mapping = {
-                    'image/gif': '.gif',
-                    'image/png': '.png',
-                    'image/jpeg': '.jpeg',
-                    'image/jpg': '.jpeg',
-                    'video/mp4': '.mp4',
-                    'image/webp': '.webp'
-                }
-                ext = mapping.get(content_type)
-                if not ext:
-                    ext = os.path.splitext(media_url.split('?')[0])[-1].lower() or '.jpeg'
-                if not ext.startswith('.'):
-                    ext = '.' + ext
-
-                save_dir = os.path.join('static', 'media')
-                os.makedirs(save_dir, exist_ok=True)
-                save_path = os.path.join(save_dir, f"{post_id}{ext}")
-                with open(save_path, 'wb') as f:
-                    f.write(media_response.content)
-                media_url = f"{post_id}{ext}"
+            media_url = download_media_by_id(post_url, post_id)
 
         except requests.exceptions.RequestException as e:
             return {"error": f"Error fetching post data from {post_url}: {e}"}

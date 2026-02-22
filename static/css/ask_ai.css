@@ -1,0 +1,116 @@
+.chat-main {
+    width: min(95vw, 800px);
+    margin: 0 auto;
+    height: calc(100vh - var(--nav-space) - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: var(--clr-bg2);
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: var(--common-spacing);
+    border-bottom: 1px solid var(--clr-border-neon);
+    text-align: center;
+}
+
+.chat-header p {
+    font-size: 0.85rem;
+    color: var(--clr-p);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: var(--common-spacing);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message {
+    max-width: 85%;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-message {
+    align-self: flex-end;
+}
+
+.user-message .message-content {
+    background-color: var(--clr-accent);
+    color: #fff;
+    border-radius: 15px 15px 0 15px;
+    padding: 10px 15px;
+}
+
+.ai-message {
+    align-self: flex-start;
+}
+
+.ai-message .message-content {
+    background-color: var(--clr-bg3);
+    border: 1px solid var(--clr-border-neon);
+    border-radius: 15px 15px 15px 0;
+    padding: 10px 15px;
+    overflow-x: auto;
+}
+
+.chat-input-area {
+    display: flex;
+    padding: var(--common-spacing);
+    gap: 10px;
+    border-top: 1px solid var(--clr-border-neon);
+    background-color: var(--clr-bg);
+}
+
+.chat-input {
+    flex-grow: 1;
+    background-color: transparent;
+    border: 2px solid var(--clr-border-neon);
+    border-radius: 20rem;
+    padding: 10px 20px;
+    color: var(--clr-p);
+    outline: none;
+}
+
+.chat-input:focus {
+    border-color: color-mix(in hsl, var(--clr-border-neon), white 20%);
+}
+
+/* AI Data Table Styles */
+.ai-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+.ai-data-table th, .ai-data-table td {
+    border: 1px solid color-mix(in hsl, var(--clr-border-neon), transparent 50%);
+    padding: 6px 10px;
+    text-align: left;
+}
+
+.ai-data-table th {
+    background-color: color-mix(in hsl, var(--clr-bg), white 5%);
+    font-weight: bold;
+}
+
+.sql-query-display {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 8px;
+    background: #000;
+    padding: 5px;
+    border-radius: 5px;
+}

@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 *.log*
 .env
+venv/
+temp_uploads/*
+start_app.sh

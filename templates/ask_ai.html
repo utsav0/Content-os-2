@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Ask AI - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ask_ai.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="chat-main">
+    <div class="chat-container rounded-border-box">
+        <div class="chat-header">
+            <h2>Chat with your Database</h2>
+            <p>Ask questions like "What are my top 5 posts by impressions?"</p>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">
+                <div class="message-content">Hello! Ask me anything about your posts, likes, or topics.</div>
+            </div>
+        </div>
+
+        <form class="chat-input-area" id="chat-form">
+            <input type="text" id="user-input" class="chat-input" placeholder="Ask a question..." autocomplete="off" required>
+            <button type="submit" class="btn btn--primary" id="send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ask_ai.js') }}"></script>
+{% endblock %}
