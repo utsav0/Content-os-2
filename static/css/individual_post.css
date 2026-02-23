@@ -1,8 +1,3 @@
-/* ============================================
-   Individual Post – Content OS
-   ============================================ */
-
-/* ── Two-Column Layout ── */
 .container {
     display: grid;
     grid-template-columns: 1fr 320px;
@@ -17,7 +12,6 @@
     gap: var(--space-lg);
 }
 
-/* ── Media ── */
 .post-media {
     width: 60%;
     min-height: 200px;
@@ -34,7 +28,6 @@
     box-shadow: var(--shadow-lift);
 }
 
-/* ── Extra Detail Pills ── */
 .extra-details {
     display: flex;
     flex-wrap: wrap;
@@ -60,7 +53,6 @@
     border-color: var(--clr-border-focus);
 }
 
-/* ── Caption ── */
 .post-caption {
     font-size: 0.85rem;
     white-space: pre-line;
@@ -68,7 +60,6 @@
     color: var(--clr-p);
 }
 
-/* ── Stats Panel (Right Column) ── */
 .section--right {
     align-items: stretch;
 }
@@ -110,7 +101,6 @@
     color: var(--clr-p);
 }
 
-/* ── Action Buttons ── */
 a.individual_post_btn {
     align-self: stretch;
     display: grid;
@@ -119,10 +109,6 @@ a.individual_post_btn {
 a.individual_post_btn .btn {
     width: 100%;
 }
-
-/* ============================================
-   Similar Posts Section
-   ============================================ */
 
 .similar-posts-container {
     display: flex;
@@ -149,7 +135,6 @@ a.individual_post_btn .btn {
     border-radius: var(--radius-pill);
 }
 
-/* ── Horizontal Scroll Strip ── */
 .similar-posts {
     display: flex;
     gap: var(--space-md);
@@ -160,7 +145,6 @@ a.individual_post_btn .btn {
     scroll-behavior: smooth;
 }
 
-/* ── Card ── */
 .similar-posts__card {
     flex: 0 0 300px;
     scroll-snap-align: start;
@@ -212,7 +196,7 @@ a.individual_post_btn .btn {
     margin-right: var(--space-xs);
 }
 
-/* ── Queue Data (shared with confirm_upload_post) ── */
+/* Shared with confirm_upload_post */
 .queue_data {
     padding: var(--space-sm) var(--space-md);
     font-size: 0.85rem;

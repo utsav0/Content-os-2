@@ -1,8 +1,3 @@
-/* ============================================
-   Search Bar – Content OS
-   ============================================ */
-
-/* ── Search Container ── */
 .search-bar {
     position: relative;
     display: flex;
@@ -22,13 +17,11 @@
     border-color: var(--clr-border-focus);
 }
 
-/* ── In Navbar ── */
 nav .search-bar {
     max-width: 44ch;
     margin-left: auto;
 }
 
-/* ── Input ── */
 .search-bar__input {
     flex: 1;
     height: 2.5rem;
@@ -45,7 +38,6 @@ nav .search-bar {
     color: hsla(0, 0%, 70%, 0.5);
 }
 
-/* ── Search Icon ── */
 .search-bar__icon-link {
     display: grid;
     place-items: center;
@@ -68,7 +60,6 @@ nav .search-bar__icon-link {
     outline: 2px solid var(--clr-border-focus);
 }
 
-/* ── Suggestions Dropdown ── */
 .search-bar__search-suggestions {
     position: absolute;
     top: calc(100% + var(--space-xs));
@@ -80,9 +71,7 @@ nav .search-bar__icon-link {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: var(--clr-bg2);
     border: 1px solid var(--clr-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lift);
@@ -94,7 +83,6 @@ nav .search-bar__icon-link {
     display: none;
 }
 
-/* ── Suggestion Items ── */
 .suggestion-item {
     display: flex;
     align-items: center;
@@ -115,7 +103,6 @@ nav .search-bar__icon-link {
     color: var(--clr-h2);
 }
 
-/* ── Type Badges ── */
 .suggestion-item::before {
     display: inline-block;
     padding: 1px var(--space-sm);
@@ -137,7 +124,6 @@ nav .search-bar__icon-link {
     --local-color: var(--clr-topic);
 }
 
-/* ── Error Suggestion ── */
 .suggestion-item--error {
     display: flex;
     align-items: center;

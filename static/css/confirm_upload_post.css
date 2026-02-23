@@ -1,8 +1,3 @@
-/* ============================================
-   Confirm Upload Post – Content OS
-   ============================================ */
-
-/* ── Tags Input Bar ── */
 .tags-input-bar {
     position: relative;
     display: flex;
@@ -42,7 +37,6 @@
     color: hsla(0, 0%, 70%, 0.5);
 }
 
-/* ── Suggestions Dropdown ── */
 .tags-input-bar__search-suggestions {
     position: absolute;
     top: calc(100% + var(--space-xs));
@@ -67,7 +61,6 @@
     display: none;
 }
 
-/* ── Suggestion Items (scoped) ── */
 .tags-input-bar .suggestion-item {
     display: flex;
     align-items: center;
@@ -104,7 +97,6 @@
     border: 1px solid color-mix(in hsl, var(--local-color), transparent 50%);
 }
 
-/* ── Tags Container ── */
 .tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -116,7 +108,6 @@
     display: none;
 }
 
-/* ── Individual Tag ── */
 .tag {
     display: inline-flex;
     align-items: center;
@@ -147,7 +138,6 @@
     color: var(--clr-error);
 }
 
-/* ── Extra Details (topic input variant) ── */
 .extra-details--topic-inp {
     width: 100%;
 }

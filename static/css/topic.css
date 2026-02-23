@@ -1,8 +1,3 @@
-/* ============================================
-   Topic Page – Content OS
-   ============================================ */
-
-/* ── Container ── */
 .topic-container {
     display: flex;
     flex-direction: column;
@@ -12,7 +7,6 @@
     margin: 0 auto;
 }
 
-/* ── Header ── */
 .topic-header {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
@@ -34,7 +28,6 @@
     font-size: 0.9rem;
 }
 
-/* ── Extra Detail Pills (topic tags) ── */
 .topic-container .extra-details {
     display: flex;
     flex-wrap: wrap;
@@ -61,7 +54,6 @@
     border-color: var(--clr-border-focus);
 }
 
-/* ── Section Headings ── */
 .topic-container>h2 {
     position: relative;
     width: fit-content;
@@ -79,7 +71,6 @@
     border-radius: var(--radius-pill);
 }
 
-/* ── Stats Grid ── */
 .topic-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -121,14 +112,12 @@
     color: var(--clr-h1);
 }
 
-/* ── Posts Grid ── */
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-md);
 }
 
-/* ── Post Card ── */
 .post-card {
     display: flex;
     flex-direction: column;

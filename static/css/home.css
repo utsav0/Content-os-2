@@ -1,10 +1,7 @@
-/* ============================================
-   Home Page – Content OS
-   ============================================ */
-:root{
-    --logo-size: 2.5rem;
+:root {
+    --logo-size: 9rem;
 }
-   
+
 body {
     display: grid;
     place-items: center;
@@ -16,23 +13,22 @@ main {
     width: min(92vw, 820px);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: calc(3.3 * var(--logo-size));
+    grid-template-rows: var(--logo-size);
     gap: var(--space-lg);
 }
 
-
-.logo{
-    font-size: var(--logo-size);
+.logo {
     place-self: center;
     grid-column: 1 / -1;
+    z-index: 20;
 }
 
-/* ── Search spans full width ── */
 .search-bar {
     grid-column: 1 / -1;
+    position: relative;
+    z-index: 20;
 }
 
-/* ── Page Links Grid ── */
 .page-links {
     grid-column: 1 / -1;
     display: grid;
@@ -40,7 +36,6 @@ main {
     gap: var(--space-md);
 }
 
-/* ── Card ── */
 .page-links__item {
     display: flex;
     flex-direction: column;
@@ -77,4 +72,15 @@ main {
 
 .page-links__button {
     width: 100%;
+}
+
+/* Darkened/blurred backdrop when search is focused */
+body:has(.search-bar:focus-within)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: hsla(230, 100%, 2%, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
