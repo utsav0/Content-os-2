@@ -1,102 +1,159 @@
+/* ============================================
+   Confirm Upload Post – Content OS
+   ============================================ */
+
+/* ── Tags Input Bar ── */
 .tags-input-bar {
-    width: 50%;
     position: relative;
-    outline: 1.5px solid transparent;
-    transition: outline-color 0.3s ease;
     display: flex;
     flex-wrap: wrap;
-    border-radius: 10px;
-    padding: 0.5rem;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-lg);
+    outline: 2px solid transparent;
+    transition: outline-color var(--dur-mid) var(--ease-out),
+        border-color var(--dur-mid) var(--ease-out);
 }
 
 .tags-input-bar:focus-within {
-    outline-color: color-mix(in hsl, var(--clr-border-neon), white 20%);
+    outline-color: var(--clr-border-focus);
+    border-color: var(--clr-border-focus);
 }
 
 .tags-input-bar__input {
-    width: 100%;
-    height: 2.5rem;
+    flex: 1;
+    min-width: 120px;
+    height: 2.25rem;
     border: none;
     outline: none;
     background: transparent;
-    padding-left: 1rem;
-    color: var(--clr-p);
+    padding-left: var(--space-sm);
+    color: var(--clr-h2);
+    font-family: inherit;
+    font-size: 0.85rem;
 }
 
+.tags-input-bar__input::placeholder {
+    color: hsla(0, 0%, 70%, 0.5);
+}
+
+/* ── Suggestions Dropdown ── */
 .tags-input-bar__search-suggestions {
+    position: absolute;
+    top: calc(100% + var(--space-xs));
+    left: 0;
     width: 100%;
-    max-height: 300px;
-    padding: 1rem;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: var(--space-sm);
     display: flex;
     flex-direction: column;
-    gap: 7px;
-    position: absolute;
-    top: calc(100% + 2px);
-    overflow: scroll;
-    background-color: var(--clr-bg);
-    z-index: 1;
+    gap: var(--space-xs);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lift);
+    z-index: 50;
 }
 
-.tags-input-bar__search-suggestions:empty{
+.tags-input-bar__search-suggestions:empty {
     display: none;
 }
 
-.suggestion-item {
-    color: color-mix(in hsl, var(--clr-p), transparent 30%);
-    height: 1.2lh;
-}
-
-.suggestion-item--topic::before {
-    content: "Topic: ";
-    --local-color: var(--clr-topic);
-}
-
-.suggestion-item::before {
-    background: color-mix(in hsl, var(--local-color), transparent 75%);
-    padding: 1px 8px;
-    border-radius: 20rem;
-    margin-right: 1ch;
-    font-size: 0.8em;
-    border: 1px solid color-mix(in hsl, var(--local-color), transparent 35%);
-    display: inline-block;
-}
-
-.suggestion-item {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: 80%;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.suggestion-item:hover {
+/* ── Suggestion Items (scoped) ── */
+.tags-input-bar .suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
     color: var(--clr-p);
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
 }
 
+.tags-input-bar .suggestion-item:hover {
+    background: hsla(0, 0%, 100%, 0.05);
+    color: var(--clr-h2);
+}
+
+.tags-input-bar .suggestion-item::before {
+    display: inline-block;
+    padding: 1px var(--space-sm);
+    border-radius: var(--radius-pill);
+    margin-right: 1ch;
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.tags-input-bar .suggestion-item--topic::before {
+    content: "Topic";
+    --local-color: var(--clr-topic);
+    background: color-mix(in hsl, var(--local-color), transparent 80%);
+    border: 1px solid color-mix(in hsl, var(--local-color), transparent 50%);
+}
+
+/* ── Tags Container ── */
 .tags-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: var(--space-sm);
 }
 
+.tags-container:empty,
 .tags-container.hidden {
     display: none;
 }
 
+/* ── Individual Tag ── */
 .tag {
-    padding: 0.3rem 0.6rem;
-    display: flex;
-    gap: 0.3rem; 
-    /* background-color: var(--clr-bg2);
-    color: var(--clr-p);
-    border-radius: 20rem;
+    display: inline-flex;
     align-items: center;
-    border: 1px solid var(--clr-border-neon);
-    */
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background: hsla(195, 80%, 50%, 0.1);
+    border: 1px solid hsla(195, 80%, 50%, 0.2);
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    color: var(--clr-h2);
+    transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.tag:hover {
+    background: hsla(195, 80%, 50%, 0.18);
 }
 
 .tag__remove-btn {
     all: unset;
     cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    color: var(--clr-p);
+    transition: color var(--dur-fast) var(--ease-out);
+}
+
+.tag__remove-btn:hover {
+    color: var(--clr-error);
+}
+
+/* ── Extra Details (topic input variant) ── */
+.extra-details--topic-inp {
+    width: 100%;
+}
+
+.extra-details--topic-inp .extra-details__item {
+    width: 100%;
+    border: none;
+    padding: 0;
 }

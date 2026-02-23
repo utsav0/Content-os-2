@@ -1,106 +1,152 @@
-/* This file can be used anywhere we need a single input type page */
+/* ============================================
+   File Upload Pages – Content OS
+   (add_post.html + video_to_gif.html)
+   ============================================ */
 
 body {
     display: grid;
     place-items: center;
     min-height: 100vh;
-
-    /* Removing reserved space for navbar */
-     margin-top: calc(-1 * var(--nav-space));
+    margin-top: 0;
 }
 
 main {
-    width: min(95vw, 600px);
+    width: min(92vw, 540px);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-2xl) var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 2rem;
-    color: var(--clr-h1);
+    font-size: 1.5rem;
 }
 
+/* ── Form ── */
 .add-post-form {
-    display: grid;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
 }
 
 .form-group {
-    display: grid;
-    gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
 }
 
 .form-group label {
     font-weight: 600;
+    font-size: 0.85rem;
     color: var(--clr-h2);
+    letter-spacing: 0.02em;
 }
 
 .form-input {
     width: 100%;
-    padding: 0.75rem;
-    border-radius: 5px;
-    border: 2px solid var(--clr-border-neon);
-    background-color: var(--clr-bg2);
-    color: var(--clr-p);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    background: hsla(0, 0%, 100%, 0.04);
+    color: var(--clr-h2);
+    font-family: inherit;
+    font-size: 0.875rem;
     outline: none;
-    transition: border-color 0.3s ease;
+    transition: border-color var(--dur-mid) var(--ease-out);
 }
 
 .form-input:focus {
-    border-color: color-mix(in hsl, var(--clr-border-neon), white 20%);
+    border-color: var(--clr-accent);
 }
 
-.btn {
-    justify-self: center;
-    width: 50%;
+/* ── File Input Custom ── */
+.form-input[type="file"] {
+    cursor: pointer;
+    padding: var(--space-md);
+    border-style: dashed;
+    text-align: center;
 }
 
+.form-input[type="file"]:hover {
+    border-color: var(--clr-accent);
+    background: hsla(195, 80%, 50%, 0.04);
+}
+
+.form-input[type="file"]::file-selector-button {
+    background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent-soft));
+    color: var(--clr-bg);
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-xs) var(--space-md);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-right: var(--space-md);
+    transition: box-shadow var(--dur-mid) var(--ease-out);
+}
+
+.form-input[type="file"]::file-selector-button:hover {
+    box-shadow: 0 4px 16px hsla(195, 90%, 44%, 0.3);
+}
+
+/* ── Submit Button ── */
+.add-post-form .btn {
+    align-self: center;
+    width: 60%;
+}
+
+/* ── File Tags ── */
 #file-tags-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
 }
-
-.file-tag span {
-    margin-right: 0.5rem;
-}
-
-.remove-file-btn {
-    background: none;
-    border: none;
-    color: var(--clr-p);
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0;
-    line-height: 1;
-}
-
-.remove-file-btn:hover {
-    color: var(--clr-h1);
-}
-
 
 .file-tag {
-    font-size: 0.85rem;
-    padding: 2px 8px;
-    border-radius: 30rem;
-    transition: background-color 0.3s ease;
-    border: 2px solid var(--clr-p);
-    display: flex;
-    gap: 1ch;
-    align-items: flex-end;
-
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--clr-border);
+    background: hsla(0, 0%, 100%, 0.04);
+    transition: background-color var(--dur-mid) var(--ease-out);
 }
 
 .file-tag:hover {
-    background-color: color-mix(in hsl, var(--clr-p), transparent 80%);
+    background: hsla(0, 0%, 100%, 0.08);
 }
 
+.remove-file-btn {
+    all: unset;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--clr-p);
+    transition: color var(--dur-fast) var(--ease-out);
+}
+
+.remove-file-btn:hover {
+    color: var(--clr-error);
+}
+
+/* ── Error Message ── */
 .error-message {
-    background-color: #ff5252;
-    color: white;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
+    background: hsla(10, 90%, 52%, 0.15);
+    border: 1px solid hsla(10, 90%, 52%, 0.3);
+    color: hsl(10, 100%, 72%);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
     text-align: center;
+    font-size: 0.9rem;
 }

@@ -1,133 +1,223 @@
+/* ============================================
+   Individual Post – Content OS
+   ============================================ */
+
+/* ── Two-Column Layout ── */
 .container {
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-lg);
     font-size: 0.9rem;
 }
 
 .container__section {
-    padding: var(--common-spacing);
+    padding: var(--space-md);
     display: flex;
     flex-direction: column;
-    gap: var(--common-spacing);
+    gap: var(--space-lg);
 }
 
-.extra-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.extra-details__item {
-    font-size: 0.85rem;
-    padding: 2px 8px;
-    border-radius: 30rem;
-    transition: background-color 0.3s ease;
-    border: 2px solid var(--clr-p);
-    display: flex;
-    gap: 1ch;
-    align-items: center;
-
-}
-
-.extra-details__item:hover {
-    background-color: color-mix(in hsl, var(--clr-p), transparent 80%);
-}
-
+/* ── Media ── */
 .post-media {
-    width: 55%;
+    width: 60%;
     min-height: 200px;
     cursor: pointer;
     object-fit: contain;
     align-self: center;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--clr-border);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--dur-mid) var(--ease-out);
 }
 
+.post-media:hover {
+    box-shadow: var(--shadow-lift);
+}
+
+/* ── Extra Detail Pills ── */
+.extra-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.extra-details__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--clr-border);
+    background: hsla(0, 0%, 100%, 0.04);
+    transition:
+        background-color var(--dur-mid) var(--ease-out),
+        border-color var(--dur-mid) var(--ease-out);
+}
+
+.extra-details__item:hover {
+    background: hsla(0, 0%, 100%, 0.08);
+    border-color: var(--clr-border-focus);
+}
+
+/* ── Caption ── */
 .post-caption {
     font-size: 0.85rem;
     white-space: pre-line;
+    line-height: 1.7;
+    color: var(--clr-p);
 }
 
-/* ======== Section Right ======== */
-
+/* ── Stats Panel (Right Column) ── */
 .section--right {
-    align-items: start;
+    align-items: stretch;
 }
 
 .post__stats {
-    display: grid;
-    gap: var(--common-spacing-half);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.post__stats h2 {
+    margin-bottom: var(--space-xs);
+    font-size: 1.1rem;
 }
 
 .post__stat {
-    border-radius: 0.5rem;
-    font-size: 0.8rem;
-    background-color: color-mix(in hsl, var(--clr-accent), transparent 90%);
-    border: 2px solid color-mix(in hsl, var(--clr-accent), transparent 80%);
-    width: 100%;
     display: flex;
-    padding: 3px 10px;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    background: hsla(195, 80%, 50%, 0.06);
+    border: 1px solid hsla(195, 80%, 50%, 0.12);
+    transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.post__stat:hover {
+    background: hsla(195, 80%, 50%, 0.1);
 }
 
 .post__stat-label {
     font-weight: 600;
     margin-right: 1ch;
+    color: var(--clr-h2);
+    white-space: nowrap;
 }
 
+.post__stat-value {
+    color: var(--clr-p);
+}
+
+/* ── Action Buttons ── */
 a.individual_post_btn {
     align-self: stretch;
     display: grid;
 }
 
-/* ======== Similar post section ======== */
-.similar-posts-container{
-    display: grid;
-    justify-items: center;
-    gap: var(--common-spacing);
+a.individual_post_btn .btn {
+    width: 100%;
+}
+
+/* ============================================
+   Similar Posts Section
+   ============================================ */
+
+.similar-posts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-md);
 }
 
 .similar-posts-container h2 {
-    border-bottom: 2px solid;
-    width: fit-content;
-    padding-inline: 14px;
-    padding-bottom: 0.4rem;
+    position: relative;
+    padding-bottom: var(--space-sm);
 }
 
-.similar-posts{
-    display: grid;
-    grid-template-rows: auto auto auto;
-    grid-auto-flow: column;
-    overflow-x: scroll;
+.similar-posts-container h2::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--clr-accent), transparent);
+    border-radius: var(--radius-pill);
+}
+
+/* ── Horizontal Scroll Strip ── */
+.similar-posts {
+    display: flex;
+    gap: var(--space-md);
+    overflow-x: auto;
     max-width: 95vw;
-    gap: var(--common-spacing);
-    padding: var(--common-spacing);
+    padding: var(--space-sm) var(--space-md);
+    scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
 }
 
-.similar-posts__card{
-    grid-row: 1 / -1;
-    display: grid;
-    align-content: space-between;
-    width: 320px;
-    background-color: var(--clr-bg2);
-    border-radius: 20px;
-    padding: var(--common-spacing);   
-    gap: var(--common-spacing);
-    font-size: 0.85em;
-}
-
-.similar-posts__media{
-    width: 100%;
-    min-height: 300px;
-    border-radius: 20px;
-    background-color: var(--clr-bg);
-    max-height: 380px;
-}
-
-.similar-posts__stats{
+/* ── Card ── */
+.similar-posts__card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
     display: flex;
-    gap: var(--common-spacing);
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    font-size: 0.85rem;
+    transition:
+        transform var(--dur-mid) var(--ease-out),
+        box-shadow var(--dur-mid) var(--ease-out),
+        border-color var(--dur-mid) var(--ease-out);
+}
+
+.similar-posts__card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lift), var(--shadow-glow);
+    border-color: var(--clr-border-focus);
+}
+
+.similar-posts__media {
+    width: 100%;
+    min-height: 240px;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    background: var(--clr-bg);
+}
+
+.similar-posts__caption {
+    flex: 1;
+    line-height: 1.5;
+}
+
+.similar-posts__stats {
+    display: flex;
+    gap: var(--space-md);
     justify-content: space-around;
 }
 
-.similar-posts__stats i{
-    color: color-mix(in hsl, var(--clr-accent), transparent 50%);
+.similar-posts__stats i {
+    color: color-mix(in hsl, var(--clr-accent), transparent 35%);
+    margin-right: var(--space-xs);
+}
+
+/* ── Queue Data (shared with confirm_upload_post) ── */
+.queue_data {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.85rem;
+}
+
+.queue_index b {
+    color: var(--clr-h2);
 }

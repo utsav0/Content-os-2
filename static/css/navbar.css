@@ -1,40 +1,75 @@
+/* ============================================
+   Navbar – Content OS
+   ============================================ */
+
 body {
-  margin-top: var(--nav-space);
+  margin-top: var(--nav-height);
 }
 
+/* ── Nav Container ── */
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: var(--clr-bg2);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--clr-border);
+  box-shadow: 0 1px 16px hsla(0, 0%, 0%, 0.3);
 }
 
+/* ── Nav List ── */
 .nav__list {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: var(--space-lg);
   margin: 0;
-  padding: 1rem 2rem;
+  padding: var(--space-sm) var(--space-xl);
   list-style: none;
+  height: var(--nav-height);
 }
 
+/* ── Nav Links ── */
 .nav__link {
+  position: relative;
+  font-size: 0.875rem;
   font-weight: 500;
-  transition: color 0.2s ease, transform 0.2s ease;
+  letter-spacing: 0.01em;
+  transition: color var(--dur-mid) var(--ease-out);
+}
+
+.nav__link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--clr-accent);
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-mid) var(--ease-out);
+}
+
+.nav__link:hover::after,
+.nav__link--active::after {
+  width: 100%;
 }
 
 .nav__link--active {
-  color: var(--clr-link);
+  color: var(--clr-accent);
   font-weight: 600;
-  border-bottom: 2px solid currentColor;
 }
 
+/* ── Download Icon Tooltip ── */
 .nav__item--icon {
   cursor: pointer;
+}
+
+.nav__item--home {
+  width: 45px;
+  height: auto;
 }
 
 .nav__item--icon--download {
@@ -43,22 +78,113 @@ body {
 
 .nav__item--icon--download::after {
   content: "Download Data";
-  text-wrap: nowrap;
-  background-color: var(--clr-h1);
-  padding: 2px 4px;
-  border-radius: 5px;
-  color: var(--clr-bg2);
-  font-size: 0.8rem;
-  left: 50%;
-  top: calc(10px + 100%);
-  transform: translateX(-50%);
+  white-space: nowrap;
   position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px);
+  background: var(--clr-h1);
+  color: var(--clr-bg);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
   opacity: 0;
-  display: none;
-  transition: all 1s;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-mid) var(--ease-out),
+    transform var(--dur-mid) var(--ease-out);
 }
 
 .nav__item--icon--download:hover::after {
   opacity: 1;
-  display: inline;
+  transform: translateX(-50%) translateY(0);
+}
+
+@property --dash-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: white;
+}
+
+.logo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  position: relative;
+  --circle1-pad: 0.9em;
+  --circle2-pad: 1.8em;
+  --dash-thickness: 0.12em;
+  --dash-count: 4;
+  --dash-gap: 15deg;
+  --grad-start: #F093FB;
+  --grad-end: #F5576C;
+  --transition-dur: var(--dur-slow);
+
+  --dash-plus-gap-size: calc((360deg / var(--dash-count)));
+  --dash-size: calc(var(--dash-plus-gap-size) - var(--dash-gap));
+
+  background-image: linear-gradient(45deg,
+      var(--grad-start) 0%,
+      color-mix(in oklch, var(--grad-start) 92%, var(--grad-end)) 8%,
+      color-mix(in oklch, var(--grad-start) 83%, var(--grad-end)) 17%,
+      color-mix(in oklch, var(--grad-start) 75%, var(--grad-end)) 25%,
+      color-mix(in oklch, var(--grad-start) 67%, var(--grad-end)) 33%,
+      color-mix(in oklch, var(--grad-start) 58%, var(--grad-end)) 42%,
+      color-mix(in oklch, var(--grad-start) 50%, var(--grad-end)) 50%,
+      color-mix(in oklch, var(--grad-start) 42%, var(--grad-end)) 58%,
+      color-mix(in oklch, var(--grad-start) 33%, var(--grad-end)) 67%,
+      color-mix(in oklch, var(--grad-start) 25%, var(--grad-end)) 75%,
+      color-mix(in oklch, var(--grad-start) 17%, var(--grad-end)) 83%,
+      color-mix(in oklch, var(--grad-start) 8%, var(--grad-end)) 92%,
+      var(--grad-end) 100%);
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: currentColor;
+  transition: color var(--transition-dur) ease;
+}
+
+.logo:hover {
+  color: transparent;
+}
+
+/* The dashed circles */
+.logo::before,
+.logo::after {
+  content: '';
+  position: absolute;
+  aspect-ratio: 1;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(var(--dash-color) 0 var(--dash-size),
+      transparent var(--dash-size) calc(var(--dash-size) + var(--dash-gap)));
+
+  mask: radial-gradient(farthest-side,
+      transparent calc(100% - var(--dash-thickness)),
+      #000 0);
+  transition: rotate var(--transition-dur) ease, --dash-color var(--transition-dur) ease;
+}
+
+/* Inner circle */
+.logo::before {
+  width: calc(100% + var(--circle1-pad, 10px));
+  rotate: calc(var(--dash-plus-gap-size) / 2);
+}
+
+/* Outer circle */
+.logo::after {
+  width: calc(100% + var(--circle2-pad, 20px));
+}
+
+.logo:hover::before {
+  --dash-color: var(--grad-start);
+  rotate: var(--dash-plus-gap-size);
+}
+
+.logo:hover::after {
+  --dash-color: var(--grad-end);
+  rotate: calc(-1 * var(--dash-plus-gap-size));
 }

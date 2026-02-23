@@ -8,8 +8,9 @@
 
 {% block content %}
 <main>
+    <div class="logo">OS</div>
     <div class="search-bar rounded-border-box">
-        <input type="text" name="search" id="search-input" class="search-bar__input" placeholder="Search..."
+        <input type="text" name="search" id="search-input" class="search-bar__input" placeholder="Search posts and topics..."
             autocomplete="off">
         <a href="#" class="search-bar__icon-link centered-grid hoverable-white nulled-link" aria-label="Search">
             <i class="fa-solid fa-magnifying-glass search-bar__icon"></i>
@@ -27,7 +28,7 @@
             </a>
         </div>
 
-        <div class="page-links__item page-links__item--topics brounded-boxox">
+        <div class="page-links__item page-links__item--topics rounded-box">
             <h2 class="page-links__title">Topics</h2>
             <div class="page-links__desc">See all the topics, filter them with custom criteria and more.</div>
             <a href="/topics">
@@ -45,7 +46,7 @@
                 </button>
             </a>
         </div>
-        <div class="page-links__item page-links__item--add-post rounded-box">
+        <div class="page-links__item page-links__item--download-posts rounded-box">
             <h2 class="page-links__title">Download all posts</h2>
             <div class="page-links__desc">Download all the post data as a JSON file.</div>
             <a href="/download">
@@ -54,10 +55,19 @@
                 </button>
             </a>
         </div>
-        <div class="page-links__item page-links__item--add-post rounded-box">
+        <div class="page-links__item page-links__item--video-to-gif rounded-box">
             <h2 class="page-links__title">Video to GIF</h2>
             <div class="page-links__desc">Convert a MP4 video to GIF without loosing quality.</div>
             <a href="/video-to-gif">
+                <button class="page-links__button btn btn--primary">
+                    Go to page
+                </button>
+            </a>
+        </div>
+        <div class="page-links__item page-links__item--ask-ai rounded-box">
+            <h2 class="page-links__title">Ask AI</h2>
+            <div class="page-links__desc">Ask questions to AI about anything about the database.</div>
+            <a href="/ask-ai">
                 <button class="page-links__button btn btn--primary">
                     Go to page
                 </button>

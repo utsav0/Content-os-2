@@ -1,26 +1,80 @@
+/* ============================================
+   Home Page – Content OS
+   ============================================ */
+:root{
+    --logo-size: 2.5rem;
+}
+   
 body {
     display: grid;
     place-items: center;
     min-height: 100vh;
-
-    /* Removing reserved space for navbar */
     margin-top: 0;
 }
 
 main {
-    width: min(95vw, 800px);
+    width: min(92vw, 820px);
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--common-spacing);
+    grid-template-rows: calc(3.3 * var(--logo-size));
+    gap: var(--space-lg);
 }
 
-.search-bar,
-.page-links {
+
+.logo{
+    font-size: var(--logo-size);
+    place-self: center;
     grid-column: 1 / -1;
 }
 
+/* ── Search spans full width ── */
+.search-bar {
+    grid-column: 1 / -1;
+}
+
+/* ── Page Links Grid ── */
 .page-links {
+    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: subgrid;
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-md);
+}
+
+/* ── Card ── */
+.page-links__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    transition:
+        transform var(--dur-mid) var(--ease-out),
+        box-shadow var(--dur-mid) var(--ease-out),
+        border-color var(--dur-mid) var(--ease-out);
+}
+
+.page-links__item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift), var(--shadow-glow);
+    border-color: var(--clr-border-focus);
+}
+
+.page-links__title {
+    font-size: 1.1rem;
+}
+
+.page-links__desc {
+    font-size: 0.85rem;
+    color: var(--clr-p);
+    line-height: 1.5;
+    flex: 1;
+}
+
+.page-links__button {
+    width: 100%;
 }
