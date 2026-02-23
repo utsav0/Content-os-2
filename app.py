@@ -620,12 +620,18 @@ def ask_ai_query():
     if not user_question:
         return jsonify({"error": "No question provided"}), 400
 
+    sql_query = None
     try:
-        sql_query = ask_ai.generate_sql(user_question)
+        query_info = ask_ai.generate_query(user_question)
+        query_type = query_info.get("type", "simple")
+        sql_query = query_info.get("sql", "")
         
-        if not sql_query.upper().strip().startswith("SELECT"):
+        clean_query = sql_query.strip().lstrip('(').lstrip().upper()
+        allowed_starts = ("SELECT", "WITH", "SHOW", "DESCRIBE", "EXPLAIN")
+        
+        if not clean_query.startswith(allowed_starts):
             return jsonify({
-                "error": "The AI generated an invalid or unsafe query.", 
+                "error": "The AI generated an invalid query.", 
                 "sql": sql_query
             }), 400
 
@@ -633,11 +639,30 @@ def ask_ai_query():
             cursor = conn.cursor(dictionary=True)
             cursor.execute(sql_query)
             results = cursor.fetchall()
+
+            #Convert big numbers to string to avoid precision loss
+            for row in results:
+                for key, value in row.items():
+                    if key == 'post_id' and value is not None:
+                        row[key] = str(value)
+                    elif isinstance(value, int) and value > 9007199254740991:
+                        row[key] = str(value)
             
-            return jsonify({
+            response_data = {
+                "type": query_type,
                 "sql": sql_query,
                 "data": results
-            })
+            }
+
+            if query_type == "analytical":
+                try:
+                    analysis = ask_ai.analyze_results(user_question, sql_query, results)
+                    response_data["analysis"] = analysis
+                except Exception as e:
+                    app.logger.error(f"Analysis generation failed: {e}")
+                    response_data["analysis"] = "Could not generate analysis, but here is the raw data."
+
+            return jsonify(response_data)
 
     except mysql.connector.Error as err:
         app.logger.error(f"Read-Only Database error: {err}")

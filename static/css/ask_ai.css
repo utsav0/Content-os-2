@@ -151,3 +151,15 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--clr-border);
 }
+
+.ai-analysis {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--clr-h2);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+    background: hsla(195, 80%, 50%, 0.06);
+    border: 1px solid hsla(195, 80%, 50%, 0.15);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--clr-accent);
+}

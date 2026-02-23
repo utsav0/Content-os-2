@@ -79,35 +79,6 @@ body {
   height: auto;
 }
 
-.nav__item--icon--download {
-  position: relative;
-}
-
-.nav__item--icon--download::after {
-  content: "Download Data";
-  white-space: nowrap;
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 8px);
-  transform: translateX(-50%) translateY(-4px);
-  background: var(--clr-h1);
-  color: var(--clr-bg);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 500;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--dur-mid) var(--ease-out),
-    transform var(--dur-mid) var(--ease-out);
-}
-
-.nav__item--icon--download:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
 @property --dash-color {
   syntax: '<color>';
   inherits: true;
