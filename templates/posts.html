@@ -3,6 +3,7 @@
 {% block title %}Posts - Content OS{% endblock %}
 
 {% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/data-list.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/posts.css') }}">
 {% endblock %}
 
@@ -76,13 +77,13 @@
             <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-latest-dates"></i>
         </div>
     </div>
-    <div id="posts-container" class="data-container__item data-container__item--post-container">
+    <div id="posts-container" class="data-container__rows">
         {% for post in posts %}
-        <div class="post">
-            <a href="/post/{{ post.post_id }}" class="post__caption hoverable-white nulled-link" target="_blank">
+        <div class="data-row">
+            <a href="/post/{{ post.post_id }}" class="data-row__title hoverable-white nulled-link" target="_blank">
                 {{ post.caption|e }}
             </a>
-            <div class="post__stats">
+            <div class="data-row__stats">
                 <span><i class="fas fa-eye"></i> {{ post.impressions }}</span>
                 <span><i class="fas fa-heart"></i> {{ post.likes }}</span>
                 <span><i class="fas fa-comment"></i> {{ post.comments }}</span>

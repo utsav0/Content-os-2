@@ -1,30 +1,28 @@
 (() => {
     'use strict';
 
-    const CONFIG = { POSTS_PER_PAGE: 20, SCROLL_THRESHOLD: 100 };
+    const CONFIG = { TOPICS_PER_PAGE: 20, SCROLL_THRESHOLD: 100 };
 
     let state = {
         offset: 0,
         isLoading: false,
-        sortBy: 'post_datetime',
+        sortBy: 'last_posted',
         sortOrder: 'desc',
         filters: {}
     };
 
     const DOM = {
-        postsContainer: document.getElementById('posts-container'),
+        topicsContainer: document.getElementById('topics-container'),
         loading: document.getElementById('loading'),
         filterForm: document.querySelector('.filter-form'),
         filterBtn: document.getElementById('filter-button'),
         clearFiltersBtn: document.getElementById('clear-filters'),
         sortButtons: {
+            post_count: document.getElementById('sort-post-count'),
             impressions: document.getElementById('sort-impressions'),
             likes: document.getElementById('sort-likes'),
             comments: document.getElementById('sort-comments'),
-            date: document.getElementById('sort-dates'),
-            latest_date: document.getElementById('sort-latest-dates'),
-            ctr: document.getElementById('sort-ctr'),
-            clicks: document.getElementById('sort-clicks')
+            last_posted: document.getElementById('sort-last-posted')
         },
         filterInputs: {
             impressions_min: document.getElementById('impressions-from'),
@@ -34,67 +32,63 @@
             comments_min: document.getElementById('comments-from'),
             comments_max: document.getElementById('comments-to'),
             date_from: document.getElementById('date-from'),
-            date_to: document.getElementById('date-to'),
-            latest_date_from: document.getElementById('latest-date-from'),
-            latest_date_to: document.getElementById('latest-date-to')
+            date_to: document.getElementById('date-to')
         }
     };
 
-    function fetchPosts() {
+    function fetchTopics() {
         state.isLoading = true;
         DOM.loading.style.display = 'block';
 
         const params = new URLSearchParams({
             offset: state.offset,
-            limit: CONFIG.POSTS_PER_PAGE,
+            limit: CONFIG.TOPICS_PER_PAGE,
             sort_by: state.sortBy,
             sort_order: state.sortOrder,
             ...state.filters
         });
 
-        return fetch(`/api/posts?${params.toString()}`)
+        return fetch(`/api/topics-list?${params.toString()}`)
             .then(res => res.json())
-            .then(posts => {
-                posts.forEach(post => {
-                    const postEl = document.createElement('div');
-                    postEl.classList.add('data-row');
+            .then(topics => {
+                topics.forEach(topic => {
+                    const row = document.createElement('div');
+                    row.classList.add('data-row');
 
-                    const caption = document.createElement('a');
-                    caption.href = `/post/${post.post_id}`;
-                    caption.classList.add('data-row__title', 'hoverable-white');
-                    caption.textContent = post.caption;
+                    const name = document.createElement('a');
+                    name.href = `/topic/${topic.id}`;
+                    name.classList.add('data-row__title', 'hoverable-white', 'nulled-link');
+                    name.textContent = topic.name;
 
                     const stats = document.createElement('div');
                     stats.classList.add('data-row__stats');
                     stats.innerHTML = `
-                        <span><i class="fas fa-eye"></i> ${post.impressions !== null ? post.impressions : '-'}</span>
-                        <span><i class="fas fa-heart"></i> ${post.likes !== null ? post.likes : '-'}</span>
-                        <span><i class="fas fa-comment"></i> ${post.comments !== null ? post.comments : '-'}</span>
-                        <span><i class="fa-solid fa-rocket"></i> ${post.main_ebook_ctr !== null ? post.main_ebook_ctr : '-'}</span>
-                        <span><i class="fa-solid fa-mouse-pointer"></i> ${post.main_ebook_clicks !== null ? post.main_ebook_clicks : '-'}</span>
-                        <span><i class="fa-solid fa-calendar"></i> ${post.post_datetime}</span>
-                        <span><i class="fa-solid fa-clock"></i> ${post.latest_post_datetime}</span>
+                        <span><i class="fas fa-hashtag"></i> ${topic.post_count}</span>
+                        <span><i class="fas fa-eye"></i> ${topic.median_impressions !== null ? topic.median_impressions : '-'}</span>
+                        <span><i class="fas fa-heart"></i> ${topic.median_likes !== null ? topic.median_likes : '-'}</span>
+                        <span><i class="fas fa-comment"></i> ${topic.median_comments !== null ? topic.median_comments : '-'}</span>
+                        <span><i class="fa-solid fa-calendar"></i> ${topic.last_posted || '-'}</span>
                     `;
 
-                    postEl.appendChild(caption);
-                    postEl.appendChild(stats);
-                    DOM.postsContainer.appendChild(postEl);
+                    row.appendChild(name);
+                    row.appendChild(stats);
+                    DOM.topicsContainer.appendChild(row);
                 });
 
-                state.offset += CONFIG.POSTS_PER_PAGE;
+                state.offset += CONFIG.TOPICS_PER_PAGE;
                 state.isLoading = false;
                 DOM.loading.style.display = 'none';
             })
             .catch(err => {
-                console.error('Error fetching posts:', err);
+                console.error('Error fetching topics:', err);
                 state.isLoading = false;
                 DOM.loading.style.display = 'none';
             });
     }
 
-    function clearPosts() {
-        const posts = DOM.postsContainer.querySelectorAll('.data-row');
-        posts.forEach(p => p.remove());
+    function clearTopics() {
+        const rows = DOM.topicsContainer.querySelectorAll('.data-row');
+        rows.forEach(r => r.remove());
     }
 
     function handleFilterSubmit(e) {
@@ -105,8 +99,8 @@
             if (val) state.filters[key] = val;
         }
         state.offset = 0;
-        clearPosts();
-        fetchPosts();
+        clearTopics();
+        fetchTopics();
         DOM.filterForm.classList.add('hidden');
     }
 
@@ -114,8 +108,8 @@
         for (const input of Object.values(DOM.filterInputs)) input.value = '';
         state.filters = {};
         state.offset = 0;
-        clearPosts();
-        fetchPosts();
+        clearTopics();
+        fetchTopics();
         DOM.filterForm.classList.add('hidden');
     }
 
@@ -124,8 +118,8 @@
             if (state.sortBy === column) state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
             else { state.sortBy = column; state.sortOrder = 'desc'; }
             state.offset = 0;
-            clearPosts();
-            fetchPosts();
+            clearTopics();
+            fetchTopics();
         });
     }
 
@@ -145,23 +139,21 @@
     function init() {
         window.addEventListener('scroll', () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - CONFIG.SCROLL_THRESHOLD && !state.isLoading) {
-                fetchPosts();
+                fetchTopics();
             }
         });
 
         DOM.filterForm.addEventListener('submit', handleFilterSubmit);
         DOM.clearFiltersBtn.addEventListener('click', handleClearFilters);
 
-        setupSortButton(DOM.sortButtons.impressions, 'impressions');
-        setupSortButton(DOM.sortButtons.likes, 'likes');
-        setupSortButton(DOM.sortButtons.comments, 'comments');
-        setupSortButton(DOM.sortButtons.date, 'post_datetime');
-        setupSortButton(DOM.sortButtons.latest_date, 'latest_post_datetime');
-        setupSortButton(DOM.sortButtons.ctr, 'main_ebook_ctr');
-        setupSortButton(DOM.sortButtons.clicks, 'main_ebook_clicks');
+        setupSortButton(DOM.sortButtons.post_count, 'post_count');
+        setupSortButton(DOM.sortButtons.impressions, 'median_impressions');
+        setupSortButton(DOM.sortButtons.likes, 'median_likes');
+        setupSortButton(DOM.sortButtons.comments, 'median_comments');
+        setupSortButton(DOM.sortButtons.last_posted, 'last_posted');
 
         setupFilterToggle();
-        fetchPosts();
+        fetchTopics();
     }
 
     document.addEventListener('DOMContentLoaded', init);

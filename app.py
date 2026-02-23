@@ -78,6 +78,10 @@ def home():
 def posts():
     return render_template("posts.html")
 
+@app.route("/topics")
+def topics_list():
+    return render_template("topics.html")
+
 # Individual post details page
 @app.route("/post/<int:post_id>")
 def show_post_details(post_id):
@@ -312,6 +316,116 @@ def search_suggestions():
     except mysql.connector.Error as err:
         app.logger.error(f"Database error: {err}")
         return jsonify({"error": "Database error"}), 500
+
+@app.route("/api/topics-list")
+def api_topics_list():
+    try:
+        offset = int(request.args.get("offset", 0))
+        limit = int(request.args.get("limit", 20))
+        sort_by = request.args.get("sort_by", "last_posted")
+        sort_order = request.args.get("sort_order", "desc").upper()
+
+        impressions_min = request.args.get("impressions_min")
+        impressions_max = request.args.get("impressions_max")
+        likes_min = request.args.get("likes_min")
+        likes_max = request.args.get("likes_max")
+        comments_min = request.args.get("comments_min")
+        comments_max = request.args.get("comments_max")
+        date_from = request.args.get("date_from")
+        date_to = request.args.get("date_to")
+
+        valid_sort_columns = ["post_count", "median_impressions", "median_likes", "median_comments", "last_posted"]
+        if sort_by not in valid_sort_columns:
+            sort_by = "last_posted"
+        if sort_order not in ["ASC", "DESC"]:
+            sort_order = "DESC"
+
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+
+            query = """
+                SELECT
+                    t.id,
+                    t.name,
+                    COUNT(p.post_id) AS post_count,
+                    MAX(p.post_datetime) AS last_posted,
+                    GROUP_CONCAT(p.impressions ORDER BY p.impressions) AS all_impressions,
+                    GROUP_CONCAT(p.likes ORDER BY p.likes) AS all_likes,
+                    GROUP_CONCAT(p.comments ORDER BY p.comments) AS all_comments
+                FROM topics t
+                JOIN topic_posts tp ON t.id = tp.topic_id
+                JOIN posts p ON tp.post_id = p.post_id
+                GROUP BY t.id, t.name
+            """
+
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            def median_from_csv(csv_str):
+                if not csv_str:
+                    return None
+                vals = [int(v) for v in csv_str.split(',') if v]
+                n = len(vals)
+                if n == 0:
+                    return None
+                mid = n // 2
+                if n % 2 == 0:
+                    return (vals[mid - 1] + vals[mid]) / 2
+                return vals[mid]
+
+            topics = []
+            for row in rows:
+                topic = {
+                    'id': row['id'],
+                    'name': row['name'],
+                    'post_count': row['post_count'],
+                    'last_posted': row['last_posted'].strftime('%d %B %Y') if row['last_posted'] else None,
+                    'last_posted_raw': row['last_posted'],
+                    'median_impressions': median_from_csv(row['all_impressions']),
+                    'median_likes': median_from_csv(row['all_likes']),
+                    'median_comments': median_from_csv(row['all_comments'])
+                }
+                topics.append(topic)
+
+            if impressions_min:
+                topics = [t for t in topics if t['median_impressions'] is not None and t['median_impressions'] >= float(impressions_min)]
+            if impressions_max:
+                topics = [t for t in topics if t['median_impressions'] is not None and t['median_impressions'] <= float(impressions_max)]
+            if likes_min:
+                topics = [t for t in topics if t['median_likes'] is not None and t['median_likes'] >= float(likes_min)]
+            if likes_max:
+                topics = [t for t in topics if t['median_likes'] is not None and t['median_likes'] <= float(likes_max)]
+            if comments_min:
+                topics = [t for t in topics if t['median_comments'] is not None and t['median_comments'] >= float(comments_min)]
+            if comments_max:
+                topics = [t for t in topics if t['median_comments'] is not None and t['median_comments'] <= float(comments_max)]
+            if date_from:
+                topics = [t for t in topics if t['last_posted_raw'] and str(t['last_posted_raw']) >= date_from]
+            if date_to:
+                topics = [t for t in topics if t['last_posted_raw'] and str(t['last_posted_raw']) <= date_to]
+
+            reverse = sort_order == "DESC"
+            sort_field = 'last_posted_raw' if sort_by == 'last_posted' else sort_by
+            def sort_key(t):
+                val = t.get(sort_field)
+                if val is None:
+                    return (0, '') if reverse else (1, '')
+                return (1, val) if reverse else (0, val)
+            topics.sort(key=sort_key, reverse=reverse)
+
+            page = topics[offset:offset + limit]
+
+            for t in page:
+                t.pop('last_posted_raw', None)
+
+            return jsonify(page)
+
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error in topics list: {err}")
+        return jsonify({"error": "Database error"}), 500
+    except Exception as e:
+        app.logger.error(f"Error in topics list: {e}")
+        return jsonify({"error": "Server error"}), 500
 
 # Fetch posts for posts page
 @app.route("/api/posts")

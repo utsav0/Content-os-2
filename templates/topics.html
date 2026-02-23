@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Topics - Content OS{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/data-list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/topics.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="data-container">
+    <div class="data-container__item data-container__item--filter">
+        <i class="fa-solid fa-filter hoverable-white" id="filter-button"></i>
+        <form class="filter-form rounded-border-box hidden">
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="impressions-from">Median Impressions</label>
+                <input type="number" class="filter-form__input" id="impressions-from" name="impressions_from"
+                    placeholder="From">
+                <input type="number" class="filter-form__input" id="impressions-to" name="impressions_to"
+                    placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="likes-from">Median Likes</label>
+                <input type="number" class="filter-form__input" id="likes-from" name="likes_from" placeholder="From">
+                <input type="number" class="filter-form__input" id="likes-to" name="likes_to" placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="comments-from">Median Comments</label>
+                <input type="number" class="filter-form__input" id="comments-from" name="comments_from"
+                    placeholder="From">
+                <input type="number" class="filter-form__input" id="comments-to" name="comments_to" placeholder="To">
+            </div>
+
+            <div class="filter-form__row">
+                <label class="filter-form__label" for="date-from">Last Posted Date</label>
+                <input type="date" class="filter-form__input" id="date-from" name="date_from">
+                <input type="date" class="filter-form__input" id="date-to" name="date_to">
+            </div>
+
+            <div class="filter-form__row filter-form__row--actions">
+                <button type="button" class="filter-form__button btn btn--secondary" id="clear-filters">Clear
+                    Filters</button>
+                <button type="submit" class="filter-form__button btn btn--primary">Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="data-container__item data-container__item--header">
+        <div class="header__name hoverable-white"></div>
+        <div class="header__post-count">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-post-count"></i>
+        </div>
+        <div class="header__impressions">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-impressions"></i>
+        </div>
+        <div class="header__likes">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-likes"></i>
+        </div>
+        <div class="header__comments">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-comments"></i>
+        </div>
+        <div class="header__last-posted">
+            <i class="fa-solid fa-sort sort-icon hoverable-white" id="sort-last-posted"></i>
+        </div>
+    </div>
+
+    <div id="topics-container" class="data-container__rows"></div>
+</main>
+<div id="loading" style="display: none;">
+    <p>Loading more topics...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/topics.js') }}"></script>
+{% endblock %}

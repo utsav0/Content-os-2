@@ -124,9 +124,11 @@ body {
   top: 50%;
   translate: -50% -50%;
   border-radius: 50%;
-  background:
-    repeating-conic-gradient(var(--dash-color) 0 var(--dash-size),
-      transparent var(--dash-size) calc(var(--dash-size) + var(--dash-gap)));
+  background: repeating-conic-gradient(
+    from calc(var(--dash-gap) / 2),
+    var(--dash-color) 0 var(--dash-size),
+    transparent var(--dash-size) calc(var(--dash-size) + var(--dash-gap))
+);
 
   mask: radial-gradient(farthest-side,
       transparent calc(100% - var(--dash-thickness)),
