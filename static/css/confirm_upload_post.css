@@ -1,3 +1,19 @@
+main:has(.error){
+    min-height: 100vh;
+    align-content: center;
+    gap: 10px;
+}
+.error{
+    padding: var(--space-lg);
+    gap: var(--space-md);
+    border: 2px dashed var(--clr-error);
+}
+
+.error_message{
+    text-align: center;
+    color: var(--clr-error);
+}
+
 .tags-input-bar {
     position: relative;
     display: flex;
@@ -147,3 +163,4 @@
     border: none;
     padding: 0;
 }
+

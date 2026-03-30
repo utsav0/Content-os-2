@@ -8,7 +8,8 @@
 {% endblock %}
 
 {% block content %}
-{% if parsed_data %}
+
+{% if parsed_data and not parsed_data.error %}
 <p class="queue_data">
     <span class="queue_index"><b>Queue file {{queue_count}}: </b></span>
     <span>Post Number :{{filename}}</span>
@@ -113,7 +114,22 @@
     </section>
 </main>
 {% else %}
-<h1>No data to display.</h1>
+<main class="centered-grid">
+    <div class="error rounded-border-box centered-grid">
+        <h1 class="error_heading">
+            There's an Error Uploading Data!
+        </h1>
+        <p class="error_message">
+            {% if parsed_data and parsed_data.error %}
+            {{ parsed_data.error }}
+            {% else %}
+            No Data Parsed
+            {% endif %}
+        </p>
+        <a href="{{ url_for('confirm_upload_post', skip='true') }}" class="btn btn--secondary nulled-link">Skip this file</a>
+    </div>
+</main>
+
 {% endif %}
 {% endblock %}
 

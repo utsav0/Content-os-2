@@ -9,6 +9,7 @@ import os
 
 #Standalone function to download media from a URL using post_id as filename
 def download_media_by_id(post_url, post_id):
+    print("running")
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
         resp = requests.get(post_url, headers=headers, timeout=10)

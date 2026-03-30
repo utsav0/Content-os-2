@@ -291,9 +291,21 @@ def confirm_upload_post():
     if not post_files_queue:
         flash("All files processed! Upload more?")
         return redirect(url_for('add_post'))
+    
+    upload_folder = os.path.join(app.root_path, 'temp_uploads', 'user_uploads')
+
+    if request.args.get('skip') == 'true':
+        filename_to_skip = post_files_queue.pop(0)
+        session['post_files_queue'] = post_files_queue
+        session.modified = True
+        
+        file_path = os.path.join(upload_folder, filename_to_skip)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        return redirect(url_for('confirm_upload_post'))
 
     current_filename = post_files_queue[0]
-    upload_folder = os.path.join(app.root_path, 'temp_uploads', 'user_uploads')
     file_path = os.path.join(upload_folder, current_filename)
 
     if not os.path.exists(file_path):
