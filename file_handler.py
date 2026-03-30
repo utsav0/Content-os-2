@@ -70,22 +70,32 @@ def handle_file(file_path):
 
     try:
         if filename.endswith('.csv'):
-            df = pd.read_csv(file_path, header=None, names=['key', 'value'])
+            df = pd.read_csv(file_path, header=None, sep=None, engine='python', encoding='utf-8-sig')
         elif filename.endswith('.xlsx'):
-            df = pd.read_excel(file_path, header=None, names=['key', 'value'])
+            df = pd.read_excel(file_path, header=None)
         else:
             return {"error": f"Unsupported file type: {filename}. Please upload a .csv or .xlsx file."}
 
-        df.dropna(subset=['value'], inplace=True)
+        if df.shape[1] >= 2:
+            df = df.iloc[:, [0, 1]]
+        
+        df.columns = ['key', 'value']
+
+        df.dropna(subset=['key', 'value'], inplace=True)
+
+        df['key'] = df['key'].astype(str).str.strip().str.replace('\ufeff', '', regex=False)
         df = df[~df['key'].str.startswith('top-', na=False)]
+        
         data = df.set_index('key')['value'].to_dict()
+
+        current_app.logger.info(f"DEBUG - Cleaned Keys: {list(data.keys())}")
 
         post_url = data.get('Post URL')
         if not post_url:
             return {"error": f"'Post URL' not found in the uploaded file {filename}."}
 
         post_id = None
-        m = re.search(r'urn:li:(?:share|ugcshare):(\d+)', post_url) or re.search(r'/(\d+)/?', post_url)
+        m = re.search(r'(\d{18,21})', post_url) 
         if m:
             post_id = m.group(1)
         if not post_id:
@@ -118,7 +128,8 @@ def handle_file(file_path):
         post_datetime = None
         if post_date and post_time:
             try:
-                post_datetime = datetime.strptime(f"{post_date} {post_time}", '%b %d, %Y %I:%M %p')
+                parsed_time = pd.to_datetime(f"{post_date} {post_time}")
+                post_datetime = parsed_time.to_pydatetime()
             except ValueError as e:
                 return {"error": f"Error parsing date/time: {e}"}
         else:

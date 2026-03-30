@@ -64,7 +64,7 @@ main:has(.error){
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    background: var(--glass-bg);
+    background: var(--clr-bg2);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--clr-border);
