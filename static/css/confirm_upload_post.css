@@ -113,6 +113,13 @@ main:has(.error){
     border: 1px solid color-mix(in hsl, var(--local-color), transparent 50%);
 }
 
+.tags-input-bar .suggestion-item--graphic-desc::before {
+    content: "Graphic";
+    --local-color: hsl(270, 70%, 60%);
+    background: color-mix(in hsl, var(--local-color), transparent 80%);
+    border: 1px solid color-mix(in hsl, var(--local-color), transparent 50%);
+}
+
 .tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -154,11 +161,14 @@ main:has(.error){
     color: var(--clr-error);
 }
 
-.extra-details--topic-inp {
+.extra-details {
     width: 100%;
 }
+.extra-details--topic-inp {
+    z-index: 2;
+}
 
-.extra-details--topic-inp .extra-details__item {
+.extra-details .extra-details__item {
     width: 100%;
     border: none;
     padding: 0;

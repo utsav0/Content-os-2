@@ -53,6 +53,15 @@
     border-color: var(--clr-border-focus);
 }
 
+.extra-details__item--graphic-desc {
+    border-color: hsla(270, 70%, 60%, 0.3);
+    background: hsla(270, 70%, 60%, 0.08);
+}
+
+.extra-details__item--graphic-desc i {
+    color: hsl(270, 70%, 60%);
+}
+
 .post-caption {
     font-size: 0.85rem;
     white-space: pre-line;

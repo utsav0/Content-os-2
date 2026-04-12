@@ -148,6 +148,15 @@ def show_post_details(post_id):
             """, (post_id,))
             topics = cursor.fetchall()
 
+            # Fetch graphic descriptions for the current post
+            cursor.execute("""
+                SELECT gd.id, gd.name
+                FROM graphic_desc gd
+                JOIN graphic_desc_posts gdp ON gd.id = gdp.graphic_desc_id
+                WHERE gdp.post_id = %s
+            """, (post_id,))
+            graphic_descs = cursor.fetchall()
+
             # Fetch similar posts
             cursor.execute("""
                 SELECT p.post_id, p.media_url, p.caption, p.impressions, p.likes, p.comments, p.reposts
@@ -179,7 +188,7 @@ def show_post_details(post_id):
                 if most_recent_post_info and most_recent_post_info.get('post_datetime'):
                     most_recent_post_info['post_datetime'] = most_recent_post_info['post_datetime'].strftime('%d %B %Y')
 
-            return render_template('individual_post.html', post=post, topics=topics, similar_posts=similar_posts, most_recent_post_info=most_recent_post_info)
+            return render_template('individual_post.html', post=post, topics=topics, graphic_descs=graphic_descs, similar_posts=similar_posts, most_recent_post_info=most_recent_post_info)
 
     except mysql.connector.Error as err:
         app.logger.error(f"Database error: {err}")
@@ -699,12 +708,26 @@ def api_topics():
         app.logger.error(f"Database error: {err}")
         return jsonify({"error": "Database error"}), 500
 
+#Get graphic description suggestions for confirm post:
+@app.route("/api/graphic-descs")
+def api_graphic_descs():
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id, name FROM graphic_desc")
+            graphic_descs = cursor.fetchall()
+            return jsonify(graphic_descs)
+    except mysql.connector.Error as err:
+        app.logger.error(f"Database error: {err}")
+        return jsonify({"error": "Database error"}), 500
+
 #Save post after confirmation
 @app.route("/api/save-post", methods=['POST'])
 def save_post():
     data = request.get_json()
     post_data = data.get('post_data')
     tags = data.get('tags')
+    graphic_descs = data.get('graphic_descs', [])
 
     if not post_data or not tags:
         return jsonify({"error": "Missing data"}), 400
@@ -754,6 +777,20 @@ def save_post():
 
                 for topic_id in topic_ids:
                     cursor.execute("INSERT INTO topic_posts (post_id, topic_id) VALUES (%s, %s)", (post_id, topic_id))
+
+                # Handle graphic descriptions
+                graphic_desc_ids = []
+                for gd in graphic_descs:
+                    cursor.execute("SELECT id FROM graphic_desc WHERE name = %s", (gd,))
+                    result = cursor.fetchone()
+                    if result:
+                        graphic_desc_ids.append(result[0])
+                    else:
+                        cursor.execute("INSERT INTO graphic_desc (name) VALUES (%s)", (gd,))
+                        graphic_desc_ids.append(cursor.lastrowid)
+
+                for gd_id in graphic_desc_ids:
+                    cursor.execute("INSERT INTO graphic_desc_posts (post_id, graphic_desc_id) VALUES (%s, %s)", (post_id, gd_id))
 
                 conn.commit()
                 

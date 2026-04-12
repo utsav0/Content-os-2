@@ -29,6 +29,10 @@
                 class="extra-details__item extra-details__item--topic hoverable-white nulled-link"><i
                     class="fa-solid fa-tags"></i>{{ topic.name }}</a>
             {% endfor %}
+            {% for gd in graphic_descs %}
+            <span class="extra-details__item extra-details__item--graphic-desc"><i
+                    class="fa-solid fa-image"></i>{{ gd.name }}</span>
+            {% endfor %}
             {% if most_recent_post_info %}
             <a href="/post/{{ most_recent_post_info.post_id }}"
                 class="extra-details__item extra-details__item--last-posted hoverable-white nulled-link"><i
